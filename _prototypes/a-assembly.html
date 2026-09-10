@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A2App — Prototype A · Assembly Line</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#06070A; --ink-2:#0B0D12; --surface:#12151C; --surface-2:#171B24;
+  --line:#1C2130; --line-2:#2A3142;
+  --fg:#EAEEF6; --fg-2:#8B95AB; --fg-3:#59627A;
+  --mint:#6EE7B7; --mint-deep:#34D399; --indigo:#818CF8; --pink:#F472B6;
+  --r:14px; --r-sm:9px; --r-xs:5px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;background:var(--ink)}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;background:var(--ink);color:var(--fg);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+.serif{font-family:'Instrument Serif',Georgia,serif;font-weight:400}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+::selection{background:rgba(110,231,183,.22)}
+::-webkit-scrollbar{width:7px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px}
+
+/* ── ambient ── */
+.amb{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 22% 8%,rgba(110,231,183,.055),transparent 62%),
+    radial-gradient(ellipse 55% 45% at 82% 72%,rgba(129,140,248,.045),transparent 62%);}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.03;
+  background-image:linear-gradient(var(--fg) 1px,transparent 1px),linear-gradient(90deg,var(--fg) 1px,transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(ellipse 65% 55% at 50% 32%,#000,transparent);
+  mask-image:radial-gradient(ellipse 65% 55% at 50% 32%,#000,transparent);}
+
+/* ── chrome ── */
+.progress{position:fixed;top:0;left:0;height:2px;width:100%;z-index:99;transform-origin:0 50%;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--mint),var(--indigo),var(--pink))}
+nav{position:fixed;top:0;left:0;right:0;z-index:80;padding:16px 0;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(6,7,10,.62);border-bottom:1px solid rgba(28,33,48,.7)}
+nav .inner{max-width:1240px;margin:0 auto;padding:0 26px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--fg);font-size:.95rem}
+.logo .mark{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:.62rem;font-weight:700;color:#04120C;
+  background:linear-gradient(135deg,var(--mint),var(--mint-deep));font-family:'JetBrains Mono',monospace}
+.pill{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);border:1px solid var(--line);
+  padding:6px 12px;border-radius:100px}
+
+/* ── layout ── */
+.wrap{max-width:1240px;margin:0 auto;padding:0 26px;position:relative;z-index:2}
+.pin-wrap{position:relative}
+.pin{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center}
+
+/* ── hero ── */
+.hero-grid{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:56px;align-items:center;width:100%}
+.badge{display:inline-flex;align-items:center;gap:9px;font-size:.72rem;letter-spacing:.06em;color:var(--fg-2);
+  border:1px solid var(--line-2);background:rgba(18,21,28,.7);padding:7px 14px;border-radius:100px;margin-bottom:26px}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint);animation:blip 2.4s ease infinite}
+@keyframes blip{0%,100%{opacity:1}50%{opacity:.28}}
+h1{font-size:clamp(2.9rem,6.2vw,5.1rem);line-height:.94;letter-spacing:-.035em;font-weight:600}
+h1 em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;
+  background:linear-gradient(120deg,var(--mint),var(--mint-deep) 55%,var(--indigo));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--fg-2);font-size:1.02rem;line-height:1.62;max-width:38ch;margin-top:22px;font-weight:300}
+
+/* chat */
+.chat{margin-top:34px;display:flex;flex-direction:column;gap:10px;max-width:40ch}
+.bubble{font-size:.86rem;line-height:1.5;padding:11px 15px;border-radius:13px;position:relative}
+.bubble.user{background:rgba(110,231,183,.09);border:1px solid rgba(110,231,183,.24);color:#CFF6E5;align-self:flex-start;border-bottom-left-radius:4px}
+.bubble.agent{background:var(--surface);border:1px solid var(--line);color:var(--fg-2);align-self:flex-start;border-bottom-left-radius:4px}
+.caret{display:inline-block;width:7px;height:1em;vertical-align:-2px;background:var(--mint);margin-left:2px;animation:cb .9s steps(1) infinite}
+@keyframes cb{0%,49%{opacity:1}50%,100%{opacity:0}}
+.think{display:inline-flex;gap:4px;vertical-align:middle}
+.think i{width:4px;height:4px;border-radius:50%;background:var(--fg-3);animation:th 1.3s ease infinite}
+.think i:nth-child(2){animation-delay:.16s}.think i:nth-child(3){animation-delay:.32s}
+@keyframes th{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+/* app frame */
+.stage{position:relative;perspective:1400px}
+.frame{position:relative;border:1px solid var(--line-2);border-radius:var(--r);background:linear-gradient(180deg,var(--ink-2),#080A0E);
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.9),0 0 0 1px rgba(110,231,183,.05);overflow:hidden}
+.frame::after{content:'';position:absolute;inset:0;pointer-events:none;border-radius:var(--r);
+  background:linear-gradient(160deg,rgba(110,231,183,.07),transparent 42%)}
+.frame-bar{display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.012)}
+.frame-bar b{width:9px;height:9px;border-radius:50%;background:var(--line-2)}
+.frame-bar span{margin-left:8px;font-size:.68rem;color:var(--fg-3);letter-spacing:.04em}
+.frame-body{padding:18px;display:flex;flex-direction:column;gap:14px;min-height:330px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.kpi{border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;background:var(--surface);will-change:transform,opacity}
+.kpi .lbl{font-size:.58rem;letter-spacing:.11em;text-transform:uppercase;color:var(--fg-3)}
+.kpi .val{font-size:1.22rem;font-weight:600;letter-spacing:-.02em;margin-top:6px}
+.kpi .dl{height:2px;border-radius:2px;margin-top:9px;background:var(--line-2);overflow:hidden}
+.kpi .dl i{display:block;height:100%;width:100%;transform-origin:0 50%;transform:scaleX(0)}
+.kpi:nth-child(1) .dl i{background:var(--mint)}.kpi:nth-child(2) .dl i{background:var(--indigo)}
+.kpi:nth-child(3) .dl i{background:var(--pink)}.kpi:nth-child(4) .dl i{background:var(--mint-deep)}
+.lower{display:grid;grid-template-columns:1.5fr 1fr;gap:11px;flex:1}
+.panel{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);padding:13px;display:flex;flex-direction:column;will-change:transform,opacity}
+.panel .ttl{font-size:.6rem;letter-spacing:.11em;text-transform:uppercase;color:var(--fg-3);margin-bottom:12px}
+.bars{flex:1;display:flex;align-items:flex-end;gap:5px;min-height:96px}
+.bars i{flex:1;border-radius:2px 2px 0 0;transform-origin:50% 100%;transform:scaleY(0);
+  background:linear-gradient(180deg,var(--mint),rgba(52,211,153,.22))}
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:8px;will-change:transform,opacity}
+.row .c{height:7px;border-radius:3px;background:var(--line-2)}
+.row .c.a{flex:1.6}.row .c.b{flex:1;background:rgba(129,140,248,.4)}.row .c.c{width:22px;background:rgba(110,231,183,.45)}
+.scan{position:absolute;left:0;right:0;height:130px;pointer-events:none;opacity:0;
+  background:linear-gradient(180deg,transparent,rgba(110,231,183,.11),transparent)}
+.cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);font-size:.68rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--fg-3);display:flex;flex-direction:column;align-items:center;gap:9px}
+.cue .ln{width:1px;height:26px;background:linear-gradient(180deg,var(--fg-3),transparent)}
+
+/* ── section shell ── */
+.eyebrow{font-size:.68rem;letter-spacing:.19em;text-transform:uppercase;color:var(--mint);margin-bottom:16px}
+h2{font-size:clamp(2rem,4.1vw,3.3rem);line-height:1.05;letter-spacing:-.03em;font-weight:600}
+h2 em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;color:var(--mint)}
+.lede{color:var(--fg-2);font-weight:300;line-height:1.62;max-width:52ch;margin-top:16px}
+
+/* ── rail (how it works) ── */
+.rail{margin-top:64px;position:relative}
+.rail svg{position:absolute;top:26px;left:0;width:100%;height:4px;overflow:visible}
+.rail .track{stroke:var(--line);stroke-width:1.5}
+.rail .live{stroke:url(#g);stroke-width:1.5;stroke-linecap:round}
+.nodes{display:grid;grid-template-columns:repeat(3,1fr);gap:34px;position:relative}
+.node{will-change:transform,opacity}
+.node .dot{width:54px;height:54px;border-radius:15px;display:grid;place-items:center;font-size:1.15rem;
+  border:1px solid var(--line-2);background:var(--ink-2);position:relative;z-index:2;
+  box-shadow:0 0 0 8px var(--ink)}
+.node .num{font-size:.62rem;letter-spacing:.16em;color:var(--fg-3);margin:20px 0 9px}
+.node h3{font-size:1.12rem;font-weight:600;letter-spacing:-.015em}
+.node p{color:var(--fg-2);font-weight:300;font-size:.92rem;line-height:1.6;margin-top:9px;max-width:32ch}
+
+/* ── devices ── */
+.dev-stage{margin-top:52px;display:flex;align-items:flex-end;justify-content:center;gap:26px;height:52vh;min-height:300px}
+.dev{border:1px solid var(--line-2);border-radius:12px;background:linear-gradient(180deg,var(--ink-2),#080A0E);
+  overflow:hidden;box-shadow:0 30px 70px -28px rgba(0,0,0,.9);will-change:transform,opacity;flex:none}
+.dev .bar{display:flex;gap:5px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.dev .bar b{width:6px;height:6px;border-radius:50%;background:var(--line-2)}
+.dev .scr{padding:11px;display:flex;flex-direction:column;gap:7px}
+.dev .hd{height:9px;width:44%;border-radius:3px;background:var(--line-2)}
+.dev .rw{display:flex;gap:7px}
+.dev .bk{height:19px;border-radius:4px;background:var(--surface-2);border:1px solid var(--line);flex:1;transition:flex .55s cubic-bezier(.5,0,.2,1),height .55s cubic-bezier(.5,0,.2,1)}
+.dev .bk.m{background:rgba(110,231,183,.16);border-color:rgba(110,231,183,.3)}
+.dev .bk.i{background:rgba(129,140,248,.16);border-color:rgba(129,140,248,.3)}
+.dev .bk.p{background:rgba(244,114,182,.14);border-color:rgba(244,114,182,.28)}
+.dev .bk.h2{height:38px}.dev .bk.h3{height:56px}
+.dev-desktop{width:min(600px,54vw)}
+.dev-tablet{width:min(270px,26vw)}
+.dev-phone{width:min(158px,17vw)}
+.dev-label{text-align:center;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--fg-3);margin-top:14px}
+
+/* ── outro ── */
+.outro{padding:150px 0 110px;text-align:center}
+.back{display:inline-flex;align-items:center;gap:9px;margin-top:30px;font-size:.84rem;color:var(--mint);
+  text-decoration:none;border:1px solid rgba(110,231,183,.28);padding:11px 20px;border-radius:100px;transition:background .25s}
+.back:hover{background:rgba(110,231,183,.09)}
+
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:34px}
+  .frame-body{min-height:0}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .lower{grid-template-columns:1fr}
+  .nodes{grid-template-columns:1fr;gap:30px}
+  .rail svg{display:none}
+  .dev-stage{gap:14px;height:auto}
+  .dev-desktop{width:52vw}.dev-tablet{width:24vw}.dev-phone{width:15vw}
+  nav .pill{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .badge .dot,.caret,.think i{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="amb"></div><div class="grid"></div>
+<div class="progress" id="prog"></div>
+
+<nav><div class="inner">
+  <a class="logo" href="./index.html"><span class="mark">A2</span>A2App</a>
+  <span class="pill mono">Prototype A · Assembly Line</span>
+</div></nav>
+
+<!-- ══ HERO ══ -->
+<section class="pin-wrap" id="heroWrap" style="height:460vh">
+  <div class="pin"><div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-copy" data-copy>
+        <div class="badge"><span class="dot"></span> Inspired by A2UI · Powered by Makepad 2.0</div>
+        <h1>From <em>Agent</em><br>to <em>App</em></h1>
+        <p class="sub">AI Agents don't just chat anymore — they build entire apps. Dynamic, interactive interfaces generated on-the-fly, rendered natively across every device.</p>
+        <div class="chat">
+          <div class="bubble user"><span id="typed"></span><span class="caret" id="caret"></span></div>
+          <div class="bubble agent" id="agentBubble" style="opacity:0">
+            <span id="agentText">Generating your dashboard with 4 KPI cards, a revenue trend chart, and a regional breakdown table</span>
+            <span class="think"><i></i><i></i><i></i></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="frame" id="frame" style="opacity:0">
+          <div class="scan" id="scan"></div>
+          <div class="frame-bar"><b></b><b></b><b></b><span class="mono">sales-analytics · a2ui surface</span></div>
+          <div class="frame-body">
+            <div class="kpis">
+              <div class="kpi" data-kpi><div class="lbl">Revenue</div><div class="val">$1.24M</div><div class="dl"><i></i></div></div>
+              <div class="kpi" data-kpi><div class="lbl">Pipeline</div><div class="val">$3.8M</div><div class="dl"><i></i></div></div>
+              <div class="kpi" data-kpi><div class="lbl">Win rate</div><div class="val">38.2%</div><div class="dl"><i></i></div></div>
+              <div class="kpi" data-kpi><div class="lbl">Accounts</div><div class="val">412</div><div class="dl"><i></i></div></div>
+            </div>
+            <div class="lower">
+              <div class="panel" data-panel="chart"><div class="ttl">Revenue trend</div>
+                <div class="bars" id="bars"></div>
+              </div>
+              <div class="panel" data-panel="table"><div class="ttl">By region</div>
+                <div class="rows" id="rows"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cue" id="cue"><span class="ln"></span>Scroll to assemble</div>
+  </div></div>
+</section>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section class="pin-wrap" id="railWrap" style="height:330vh">
+  <div class="pin"><div class="wrap">
+    <div class="eyebrow" data-rail-copy>How It Works</div>
+    <h2 data-rail-copy>Agent thinks. <em>App appears.</em></h2>
+    <p class="lede" data-rail-copy>Three steps from natural language intent to a fully interactive application, rendered natively on any platform.</p>
+
+    <div class="rail">
+      <svg preserveAspectRatio="none" viewBox="0 0 1000 4">
+        <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#6EE7B7"/><stop offset=".55" stop-color="#818CF8"/><stop offset="1" stop-color="#F472B6"/></linearGradient></defs>
+        <line class="track" x1="90" y1="2" x2="910" y2="2"/>
+        <line class="live" id="live" x1="90" y1="2" x2="910" y2="2" stroke-dasharray="820" stroke-dashoffset="820"/>
+      </svg>
+      <div class="nodes">
+        <div class="node" data-node><div class="dot">💬</div><div class="num mono">01 / INTENT</div><h3>Describe What You Need</h3><p>Tell the agent what you want in plain language. A booking form, a data dashboard, an inventory tracker — anything.</p></div>
+        <div class="node" data-node><div class="dot">🧠</div><div class="num mono">02 / GENERATE</div><h3>Agent Generates UI</h3><p>The AI agent produces declarative UI components — structured data, not executable code. Safe, streamable, and framework-agnostic.</p></div>
+        <div class="node" data-node><div class="dot">✨</div><div class="num mono">03 / RENDER</div><h3>Native Rendering</h3><p>Your client renders the UI using its own native widgets — Angular, React, Flutter, or mobile. Same response, every platform.</p></div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ══ CROSS DEVICE ══ -->
+<section class="pin-wrap" id="devWrap" style="height:380vh">
+  <div class="pin"><div class="wrap" style="text-align:center">
+    <div class="eyebrow" data-dev-copy>Cross-Device</div>
+    <h2 data-dev-copy>One agent response.<br><em>Every screen.</em></h2>
+    <p class="lede" data-dev-copy style="margin:16px auto 0">The same declarative UI renders natively on desktop, tablet, and mobile — using each platform's own design system and components.</p>
+
+    <div class="dev-stage">
+      <div>
+        <div class="dev dev-desktop" data-dev="0">
+          <div class="bar"><b></b><b></b><b></b></div>
+          <div class="scr">
+            <div class="hd"></div>
+            <div class="rw"><div class="bk m"></div><div class="bk i"></div><div class="bk"></div><div class="bk"></div></div>
+            <div class="rw"><div class="bk h3"></div></div>
+            <div class="rw"><div class="bk p h2"></div><div class="bk h2"></div></div>
+          </div>
+        </div>
+        <div class="dev-label mono" data-dev-lbl="0">Desktop</div>
+      </div>
+      <div>
+        <div class="dev dev-tablet" data-dev="1">
+          <div class="bar"><b></b><b></b><b></b></div>
+          <div class="scr">
+            <div class="hd"></div>
+            <div class="rw"><div class="bk m"></div><div class="bk i"></div></div>
+            <div class="rw"><div class="bk h3"></div></div>
+            <div class="rw"><div class="bk p h2"></div></div>
+          </div>
+        </div>
+        <div class="dev-label mono" data-dev-lbl="1">Tablet</div>
+      </div>
+      <div>
+        <div class="dev dev-phone" data-dev="2">
+          <div class="bar"><b></b><b></b><b></b></div>
+          <div class="scr">
+            <div class="hd"></div>
+            <div class="rw"><div class="bk m h2"></div></div>
+            <div class="rw"><div class="bk i h2"></div></div>
+            <div class="rw"><div class="bk h3"></div></div>
+          </div>
+        </div>
+        <div class="dev-label mono" data-dev-lbl="2">Phone</div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<section class="outro"><div class="wrap">
+  <div class="eyebrow">End of prototype</div>
+  <h2>Motion that <em>argues</em>,<br>not motion that decorates.</h2>
+  <a class="back" href="./index.html">← Compare the other directions</a>
+</div></section>
+
+<script>
+(function(){
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── scrub helpers ── */
+  var clamp = function(v){return v<0?0:v>1?1:v;};
+  var range = function(p,s,e){return clamp((p-s)/(e-s));};
+  var outCubic = function(t){return 1-Math.pow(1-t,3);};
+  var outBack  = function(t){var c=1.70158,c3=c+1;return 1+c3*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
+  var lerp = function(a,b,t){return a+(b-a)*t;};
+
+  /* ── build repeating markup ── */
+  var BAR_H = [.34,.46,.4,.58,.52,.7,.63,.81,.74,.9,.83,1];
+  var bars = document.getElementById('bars');
+  BAR_H.forEach(function(h){ var i=document.createElement('i'); i.style.height=(h*100)+'%'; bars.appendChild(i); });
+  var rows = document.getElementById('rows');
+  for(var r=0;r<5;r++){
+    var d=document.createElement('div'); d.className='row';
+    d.innerHTML='<span class="c c"></span><span class="c a"></span><span class="c b" style="flex:'+(0.5+Math.abs(Math.sin(r*2.1)))+'"></span>';
+    rows.appendChild(d);
+  }
+
+  var PROMPT = 'Build me a sales analytics dashboard with charts and KPIs';
+
+  /* ── element caches ── */
+  var els = {
+    prog: document.getElementById('prog'),
+    heroWrap: document.getElementById('heroWrap'),
+    railWrap: document.getElementById('railWrap'),
+    devWrap: document.getElementById('devWrap'),
+    copy: document.querySelector('[data-copy]'),
+    typed: document.getElementById('typed'),
+    caret: document.getElementById('caret'),
+    agent: document.getElementById('agentBubble'),
+    frame: document.getElementById('frame'),
+    scan: document.getElementById('scan'),
+    cue: document.getElementById('cue'),
+    kpis: [].slice.call(document.querySelectorAll('[data-kpi]')),
+    barEls: [].slice.call(bars.children),
+    rowEls: [].slice.call(rows.children),
+    chart: document.querySelector('[data-panel="chart"]'),
+    table: document.querySelector('[data-panel="table"]'),
+    live: document.getElementById('live'),
+    nodes: [].slice.call(document.querySelectorAll('[data-node]')),
+    railCopy: [].slice.call(document.querySelectorAll('[data-rail-copy]')),
+    devCopy: [].slice.call(document.querySelectorAll('[data-dev-copy]')),
+    devs: [].slice.call(document.querySelectorAll('[data-dev]')),
+    devLbls: [].slice.call(document.querySelectorAll('[data-dev-lbl]'))
+  };
+
+  function progressOf(wrap){
+    var r = wrap.getBoundingClientRect();
+    var span = wrap.offsetHeight - window.innerHeight;
+    if(span <= 0) return 1;
+    return clamp(-r.top / span);
+  }
+
+  /* ══ HERO TIMELINE ══ */
+  function hero(p){
+    /* copy recedes once the app takes over */
+    var out = range(p,.60,.78);
+    els.copy.style.opacity = 1-out;
+    els.copy.style.transform = 'translateY('+(-34*out)+'px)';
+
+    /* prompt types itself */
+    var t = range(p,.03,.20);
+    var n = Math.round(t*PROMPT.length);
+    els.typed.textContent = PROMPT.slice(0,n);
+    els.caret.style.opacity = (p>.005 && p<.24) ? 1 : 0;
+
+    /* agent replies */
+    var ag = range(p,.21,.29);
+    els.agent.style.opacity = ag;
+    els.agent.style.transform = 'translateY('+lerp(8,0,outCubic(ag))+'px)';
+
+    /* surface frame materialises */
+    var fr = range(p,.24,.34);
+    els.frame.style.opacity = fr;
+    els.frame.style.transform = 'scale('+lerp(.94,1,outCubic(fr))+') rotateY('+lerp(7,0,outCubic(fr))+'deg)';
+
+    /* streaming scanline sweeps while components arrive */
+    var sc = range(p,.30,.80);
+    els.scan.style.opacity = (sc>0 && sc<1) ? .9 : 0;
+    els.scan.style.transform = 'translateY('+lerp(-140, els.frame.offsetHeight, sc)+'px)';
+
+    /* KPI cards fly in and snap */
+    els.kpis.forEach(function(k,i){
+      var s = .32 + i*.042, a = range(p, s, s+.11), e = outBack(a);
+      k.style.opacity = Math.min(1,a*1.5);
+      k.style.transform = 'translate('+lerp(i%2?68:-68,0,e)+'px,'+lerp(-46,0,e)+'px) rotate('+lerp(i%2?4:-4,0,e)+'deg) scale('+lerp(.86,1,e)+')';
+      var fill = range(p, s+.06, s+.22);
+      k.querySelector('.dl i').style.transform = 'scaleX('+outCubic(fill)+')';
+    });
+
+    /* chart panel + bars grow */
+    var cp = range(p,.50,.58);
+    els.chart.style.opacity = cp;
+    els.chart.style.transform = 'translateY('+lerp(40,0,outCubic(cp))+'px)';
+    els.barEls.forEach(function(b,i){
+      var s = .53 + i*.012;
+      b.style.transform = 'scaleY('+outCubic(range(p,s,s+.09))+')';
+    });
+
+    /* table panel + rows stripe in */
+    var tp = range(p,.56,.64);
+    els.table.style.opacity = tp;
+    els.table.style.transform = 'translateY('+lerp(40,0,outCubic(tp))+'px)';
+    els.rowEls.forEach(function(rw,i){
+      var s = .60 + i*.022, a = range(p,s,s+.10);
+      rw.style.opacity = a;
+      rw.style.transform = 'translateX('+lerp(26,0,outCubic(a))+'px)';
+    });
+
+    /* finished surface settles back */
+    var st = range(p,.84,1);
+    els.frame.style.transform = 'scale('+lerp(1,.93,st)+') translateY('+lerp(0,-14,st)+'px)';
+
+    els.cue.style.opacity = 1-range(p,.02,.12);
+  }
+
+  /* ══ RAIL TIMELINE ══ */
+  function rail(p){
+    els.railCopy.forEach(function(el,i){
+      var a = range(p, .02+i*.03, .16+i*.03);
+      el.style.opacity = a;
+      el.style.transform = 'translateY('+lerp(28,0,outCubic(a))+'px)';
+    });
+    /* connector draws left→right, nodes pop as it reaches them */
+    var draw = range(p,.20,.78);
+    els.live.setAttribute('stroke-dashoffset', String(820*(1-outCubic(draw))));
+    els.nodes.forEach(function(nd,i){
+      var s = .22 + i*.19, a = range(p,s,s+.16), e = outBack(a);
+      nd.style.opacity = Math.min(1,a*1.6);
+      nd.style.transform = 'translateY('+lerp(46,0,e)+'px)';
+      nd.querySelector('.dot').style.transform = 'scale('+lerp(.4,1,e)+')';
+      nd.querySelector('.dot').style.boxShadow = '0 0 0 8px var(--ink), 0 0 '+(30*a)+'px rgba(110,231,183,'+(.35*a)+')';
+    });
+  }
+
+  /* ══ DEVICE TIMELINE ══ */
+  var DEV_IN = [[.10,.28],[.34,.54],[.56,.76]];
+  function devices(p){
+    els.devCopy.forEach(function(el,i){
+      var a = range(p,.01+i*.03,.14+i*.03);
+      el.style.opacity = a;
+      el.style.transform = 'translateY('+lerp(26,0,outCubic(a))+'px)';
+    });
+    /* desktop lands first, then tablet and phone split off from behind it */
+    els.devs.forEach(function(d,i){
+      var w = DEV_IN[i], a = range(p,w[0],w[1]), e = outCubic(a);
+      d.style.opacity = a;
+      if(i===0){
+        d.style.transform = 'translateY('+lerp(50,0,e)+'px) scale('+lerp(.9,1,e)+')';
+      }else{
+        d.style.transform = 'translateX('+lerp(-110,0,e)+'px) translateY('+lerp(24,0,e)+'px) scale('+lerp(.55,1,e)+')';
+      }
+      els.devLbls[i].style.opacity = range(p,w[1]-.04,w[1]+.06);
+    });
+    /* the shared UI reflows per screen once all three are present */
+    var reflow = p > .74;
+    els.devs.forEach(function(d,i){
+      if(i===0) return;
+      d.querySelectorAll('.bk').forEach(function(b){ b.style.opacity = reflow?1:.35; });
+    });
+  }
+
+  function frameTick(){
+    els.prog.style.transform = 'scaleX('+clamp(window.scrollY/(document.body.scrollHeight-window.innerHeight))+')';
+    hero(progressOf(els.heroWrap));
+    rail(progressOf(els.railWrap));
+    devices(progressOf(els.devWrap));
+    ticking = false;
+  }
+  var ticking = false;
+  function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(frameTick); } }
+
+  /* narrow screens get the finished state inline: there is no room to stage an
+     assembly, and keeping the pins would leave ~4000px of empty scroll */
+  var STATIC = RM || innerWidth < 900;
+
+  if(STATIC){
+    /* collapse every pin to its finished state */
+    [els.heroWrap,els.railWrap,els.devWrap].forEach(function(w){ w.style.height='auto'; });
+    document.querySelectorAll('.pin').forEach(function(pn){ pn.style.position='static'; pn.style.height='auto'; pn.style.padding='110px 0'; });
+    hero(1); rail(1); devices(1);
+    els.copy.style.opacity = 1; els.copy.style.transform = 'none';
+    els.frame.style.transform = 'none';
+    els.typed.textContent = PROMPT; els.caret.style.display='none';
+    els.scan.style.opacity = 0;
+    els.cue.style.display = 'none';
+  }else{
+    addEventListener('scroll', onScroll, {passive:true});
+    addEventListener('resize', onScroll);
+    frameTick();
+  }
+})();
+</script>
+</body>
+</html>

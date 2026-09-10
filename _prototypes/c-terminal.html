@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A2App — Prototype C · Terminal to Interface</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#08090C; --ink-2:#0C0E13; --paper:#0F1116;
+  --line:#191D27; --line-2:#262C3A;
+  --fg:#F0F3F8; --fg-2:#828C9F; --fg-3:#4E5668;
+  --mint:#6EE7B7; --indigo:#818CF8; --pink:#F472B6;
+  --rail:78px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;background:var(--ink);scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--ink);color:var(--fg);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+::selection{background:rgba(110,231,183,.2)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--line-2)}
+
+/* ── hairline field ── */
+.rules{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:calc(100% / 6) 100%;opacity:.5}
+
+/* ── sticky index rail ── */
+.index{position:fixed;left:0;top:0;bottom:0;width:var(--rail);z-index:60;
+  border-right:1px solid var(--line);background:rgba(8,9,12,.86);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  display:flex;flex-direction:column;align-items:center;padding:22px 0}
+.index .mk{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;font-size:.6rem;font-weight:700;
+  color:#04120C;background:linear-gradient(135deg,var(--mint),#34D399);font-family:'JetBrains Mono',monospace;
+  text-decoration:none;flex:none}
+.index .list{margin-top:auto;margin-bottom:auto;display:flex;flex-direction:column;gap:20px;align-items:center}
+.index .item{writing-mode:vertical-rl;font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--fg-3);text-decoration:none;transition:color .3s;position:relative;padding-left:9px}
+.index .item::before{content:'';position:absolute;left:0;top:50%;width:4px;height:4px;border-radius:50%;
+  background:var(--line-2);transform:translateY(-50%);transition:background .3s,box-shadow .3s}
+.index .item.on{color:var(--fg)}
+.index .item.on::before{background:var(--mint);box-shadow:0 0 8px var(--mint)}
+.index .track{width:1px;height:120px;background:var(--line);position:relative;flex:none}
+.index .track i{position:absolute;inset:0;background:linear-gradient(180deg,var(--mint),var(--indigo));
+  transform-origin:50% 0;transform:scaleY(0)}
+
+/* ── page shell ── */
+.page{margin-left:var(--rail)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 44px;position:relative;z-index:2}
+section{position:relative;border-bottom:1px solid var(--line)}
+
+/* ── drawn rules ── */
+.hr{height:1px;background:var(--line-2);transform-origin:0 50%;transform:scaleX(0);
+  transition:transform 1.4s cubic-bezier(.16,1,.3,1)}
+.is-in .hr{transform:scaleX(1)}
+
+/* ── line-mask type ── */
+.lm{display:block;overflow:hidden;padding-bottom:.06em}
+.lm>span{display:block;transform:translateY(105%);
+  transition:transform 1.1s cubic-bezier(.19,1,.22,1)}
+.is-in .lm>span{transform:translateY(0)}
+.is-in .lm:nth-of-type(2)>span{transition-delay:.10s}
+.is-in .lm:nth-of-type(3)>span{transition-delay:.20s}
+.fd{opacity:0;transform:translateY(16px);
+  transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.is-in .fd{opacity:1;transform:none}
+.is-in .t1{transition-delay:.22s}.is-in .t2{transition-delay:.32s}.is-in .t3{transition-delay:.42s}
+.is-in .t4{transition-delay:.52s}.is-in .t5{transition-delay:.62s}
+
+/* ── hero ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 0 60px}
+.tag{font-size:.64rem;letter-spacing:.26em;text-transform:uppercase;color:var(--fg-3);
+  display:flex;align-items:center;gap:14px;margin-bottom:44px}
+.tag i{flex:1;height:1px;background:var(--line-2);display:block;max-width:190px}
+h1{font-size:clamp(3.4rem,10.5vw,8.6rem);line-height:.86;letter-spacing:-.05em;font-weight:600}
+h1 em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--mint)}
+.sub{color:var(--fg-2);font-size:1.02rem;line-height:1.68;max-width:44ch;margin-top:40px;font-weight:300}
+
+/* ── log ticker ── */
+.log{margin-top:46px;border:1px solid var(--line);background:var(--ink-2);border-radius:4px;overflow:hidden;max-width:640px}
+.log-hd{display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid var(--line);
+  font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-3)}
+.log-hd b{width:5px;height:5px;border-radius:50%;background:var(--mint);box-shadow:0 0 7px var(--mint)}
+.log-bd{padding:14px 15px;font-family:'JetBrains Mono',monospace;font-size:.76rem;line-height:1.95;min-height:158px}
+.log-bd .ln{color:var(--fg-2);white-space:pre-wrap}
+.log-bd .ln .k{color:var(--mint)}
+.log-bd .ln .d{color:var(--fg-3)}
+.log-bd .ln .i{color:var(--indigo)}
+.cur{display:inline-block;width:7px;height:.95em;background:var(--mint);vertical-align:-2px;
+  animation:bl .85s steps(1) infinite}
+@keyframes bl{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+/* ── stats ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-top:52px;max-width:640px}
+.stat{background:var(--ink);padding:20px 22px}
+.stat .n{font-size:1.9rem;font-weight:600;letter-spacing:-.03em;font-family:'JetBrains Mono',monospace}
+.stat .l{font-size:.6rem;letter-spacing:.17em;text-transform:uppercase;color:var(--fg-3);margin-top:7px}
+
+/* ── section shell ── */
+.sec{padding:130px 0}
+.eyebrow{font-size:.63rem;letter-spacing:.26em;text-transform:uppercase;color:var(--fg-3);
+  display:flex;align-items:center;gap:13px;margin-bottom:34px}
+.eyebrow b{color:var(--mint);font-weight:400}
+h2{font-size:clamp(2.2rem,5.4vw,4rem);line-height:.98;letter-spacing:-.04em;font-weight:600}
+h2 em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;color:var(--mint)}
+.lede{color:var(--fg-2);font-weight:300;line-height:1.7;max-width:50ch;margin-top:22px}
+
+/* ── steps (drawn schematic) ── */
+.schematic{margin-top:76px;position:relative}
+.schematic svg.conn{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.schematic svg.conn path{fill:none;stroke:var(--line-2);stroke-width:1;
+  stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.6s cubic-bezier(.5,0,.2,1),stroke 1.6s}
+.is-in .schematic svg.conn path{stroke-dashoffset:0;stroke:rgba(110,231,183,.42)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.step{background:var(--ink);padding:30px 26px 34px;position:relative}
+.step::before{content:'';position:absolute;left:0;top:0;height:1px;width:100%;transform-origin:0 50%;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--mint),transparent);transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+.is-in .step::before{transform:scaleX(1)}
+.is-in .step:nth-child(2)::before{transition-delay:.16s}
+.is-in .step:nth-child(3)::before{transition-delay:.32s}
+.step .n{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.18em;color:var(--fg-3);margin-bottom:26px}
+.step h3{font-size:1.14rem;font-weight:600;letter-spacing:-.02em}
+.step p{color:var(--fg-2);font-weight:300;font-size:.92rem;line-height:1.68;margin-top:12px}
+.step .sig{margin-top:24px;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--fg-3)}
+.step .sig span{color:var(--mint)}
+
+/* ── blueprint devices ── */
+.blue{margin-top:76px;display:flex;align-items:flex-end;justify-content:center;gap:44px}
+.bp{position:relative}
+.bp svg{display:block;overflow:visible}
+.bp svg .st{fill:none;stroke:var(--line-2);stroke-width:1;
+  stroke-dasharray:var(--len,2000);stroke-dashoffset:var(--len,2000);
+  transition:stroke-dashoffset 1.9s cubic-bezier(.4,0,.15,1)}
+.is-in .bp svg .st{stroke-dashoffset:0}
+.bp svg .fl{opacity:0;transition:opacity .8s ease}
+.is-in .bp svg .fl{opacity:1;transition-delay:1.1s}
+.bp:nth-child(2) svg .st{transition-delay:.22s}
+.bp:nth-child(3) svg .st{transition-delay:.44s}
+.bp .cap{text-align:center;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--fg-3);margin-top:20px}
+.bp .dim{position:absolute;font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--fg-3);letter-spacing:.08em}
+
+.outro{padding:150px 0 130px}
+.back{display:inline-flex;align-items:center;gap:9px;margin-top:36px;font-size:.82rem;color:var(--mint);
+  text-decoration:none;border-bottom:1px solid rgba(110,231,183,.32);padding-bottom:4px}
+
+@media (max-width:900px){
+  :root{--rail:0px}
+  .index{width:100%;height:52px;bottom:auto;flex-direction:row;padding:0 16px;gap:14px;
+    border-right:none;border-bottom:1px solid var(--line)}
+  .index .list{flex-direction:row;gap:14px;margin:0 auto}
+  .index .item{writing-mode:horizontal-tb;padding-left:11px}
+  .index .track{width:60px;height:1px}
+  .index .track i{transform-origin:0 50%;transform:scaleX(0)}
+  .page{margin-left:0;padding-top:52px}
+  .wrap{padding:0 22px}
+  .steps,.stats{grid-template-columns:1fr}
+  /* blueprints carry intrinsic pixel widths; let the viewBox scale them instead */
+  .blue{gap:12px;align-items:flex-end}
+  /* grow in proportion to intrinsic width so the size hierarchy survives */
+  .bp{min-width:0}
+  .bp:nth-child(1){flex:380 1 0}
+  .bp:nth-child(2){flex:176 1 0}
+  .bp:nth-child(3){flex:112 1 0}
+  .bp svg{width:100%;height:auto}
+  .bp .cap{font-size:.52rem;letter-spacing:.12em}
+  .schematic svg.conn{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .lm>span,.fd,.hr,.step::before,.bp svg .st,.bp svg .fl,.schematic svg.conn path{
+    transition:none!important;transform:none!important;opacity:1!important;stroke-dashoffset:0!important}
+  .cur{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="rules"></div>
+
+<aside class="index">
+  <a class="mk" href="./index.html">A2</a>
+  <div class="list">
+    <a class="item on" href="#hero" data-idx="hero">00 Intent</a>
+    <a class="item" href="#how" data-idx="how">01 Method</a>
+    <a class="item" href="#devices" data-idx="devices">02 Surface</a>
+  </div>
+  <div class="track"><i id="trk"></i></div>
+</aside>
+
+<div class="page">
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="hero" data-reveal>
+  <div class="wrap">
+    <div class="tag mono fd"><i></i>A2App / Agent → App<i></i></div>
+    <h1>
+      <span class="lm"><span>From <em>Agent</em></span></span>
+      <span class="lm"><span>to <em>App</em></span></span>
+    </h1>
+    <p class="sub fd t2">AI Agents don't just chat anymore — they build entire apps. Dynamic, interactive interfaces generated on-the-fly, rendered natively across every device.</p>
+
+    <div class="log fd t3">
+      <div class="log-hd mono"><b></b>aosf · harness</div>
+      <div class="log-bd" id="log"></div>
+    </div>
+
+    <div class="stats fd t4">
+      <div class="stat"><div class="n" data-count="4" data-suffix="">0</div><div class="l">Layer model</div></div>
+      <div class="stat"><div class="n" data-count="6" data-suffix="">0</div><div class="l">Factory steps</div></div>
+      <div class="stat"><div class="n" data-count="1" data-suffix=" response">0</div><div class="l">Every platform</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section class="sec" id="how" data-reveal>
+  <div class="wrap">
+    <div class="eyebrow mono"><b>01</b> — How It Works</div>
+    <h2>
+      <span class="lm"><span>Agent thinks.</span></span>
+      <span class="lm"><span><em>App appears.</em></span></span>
+    </h2>
+    <p class="lede fd t2">Three steps from natural language intent to a fully interactive application, rendered natively on any platform.</p>
+
+    <div class="schematic">
+      <svg class="conn" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M 166 20 L 500 20" pathLength="1"/>
+        <path d="M 500 20 L 834 20" pathLength="1"/>
+      </svg>
+      <div class="steps">
+        <div class="step">
+          <div class="n">01 / INTENT</div>
+          <h3>Describe What You Need</h3>
+          <p>Tell the agent what you want in plain language. A booking form, a data dashboard, an inventory tracker — anything.</p>
+          <div class="sig">in: <span>natural language</span></div>
+        </div>
+        <div class="step">
+          <div class="n">02 / GENERATE</div>
+          <h3>Agent Generates UI</h3>
+          <p>The AI agent produces declarative UI components — structured data, not executable code. Safe, streamable, and framework-agnostic.</p>
+          <div class="sig">out: <span>a2ui components[]</span></div>
+        </div>
+        <div class="step">
+          <div class="n">03 / RENDER</div>
+          <h3>Native Rendering</h3>
+          <p>Your client renders the UI using its own native widgets — Angular, React, Flutter, or mobile. Same response, every platform.</p>
+          <div class="sig">via: <span>makepad 2.0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CROSS DEVICE ══ -->
+<section class="sec" id="devices" data-reveal>
+  <div class="wrap">
+    <div class="eyebrow mono"><b>02</b> — Cross-Device</div>
+    <h2>
+      <span class="lm"><span>One agent response.</span></span>
+      <span class="lm"><span><em>Every screen.</em></span></span>
+    </h2>
+    <p class="lede fd t2">The same declarative UI renders natively on desktop, tablet, and mobile — using each platform's own design system and components.</p>
+
+    <div class="blue">
+      <div class="bp">
+        <svg width="380" height="248" viewBox="0 0 380 248">
+          <rect class="st" x=".5" y=".5" width="379" height="247" rx="6"/>
+          <path class="st" d="M0 30 H380"/>
+          <circle class="st" cx="16" cy="15" r="3.5"/><circle class="st" cx="30" cy="15" r="3.5"/><circle class="st" cx="44" cy="15" r="3.5"/>
+          <rect class="st" x="18" y="48" width="82" height="46" rx="4"/>
+          <rect class="st" x="112" y="48" width="82" height="46" rx="4"/>
+          <rect class="st" x="206" y="48" width="82" height="46" rx="4"/>
+          <rect class="st" x="300" y="48" width="62" height="46" rx="4"/>
+          <rect class="st" x="18" y="108" width="228" height="118" rx="4"/>
+          <rect class="st" x="258" y="108" width="104" height="118" rx="4"/>
+          <g class="fl">
+            <rect x="18" y="48" width="82" height="46" rx="4" fill="rgba(110,231,183,.13)"/>
+            <rect x="112" y="48" width="82" height="46" rx="4" fill="rgba(129,140,248,.13)"/>
+            <rect x="258" y="108" width="104" height="118" rx="4" fill="rgba(244,114,182,.10)"/>
+            <path d="M34 210 L64 190 L94 198 L124 168 L154 176 L184 146 L214 154" stroke="#6EE7B7" stroke-width="1.5" fill="none"/>
+          </g>
+        </svg>
+        <div class="cap">Desktop — 4 col</div>
+      </div>
+      <div class="bp">
+        <svg width="176" height="230" viewBox="0 0 176 230">
+          <rect class="st" x=".5" y=".5" width="175" height="229" rx="6"/>
+          <path class="st" d="M0 28 H176"/>
+          <circle class="st" cx="14" cy="14" r="3.5"/><circle class="st" cx="27" cy="14" r="3.5"/>
+          <rect class="st" x="14" y="44" width="70" height="42" rx="4"/>
+          <rect class="st" x="92" y="44" width="70" height="42" rx="4"/>
+          <rect class="st" x="14" y="98" width="148" height="66" rx="4"/>
+          <rect class="st" x="14" y="176" width="148" height="40" rx="4"/>
+          <g class="fl">
+            <rect x="14" y="44" width="70" height="42" rx="4" fill="rgba(110,231,183,.13)"/>
+            <rect x="92" y="44" width="70" height="42" rx="4" fill="rgba(129,140,248,.13)"/>
+            <rect x="14" y="176" width="148" height="40" rx="4" fill="rgba(244,114,182,.10)"/>
+            <path d="M26 152 L52 136 L78 142 L104 118 L130 126 L150 108" stroke="#6EE7B7" stroke-width="1.5" fill="none"/>
+          </g>
+        </svg>
+        <div class="cap">Tablet — 2 col</div>
+      </div>
+      <div class="bp">
+        <svg width="112" height="212" viewBox="0 0 112 212">
+          <rect class="st" x=".5" y=".5" width="111" height="211" rx="12"/>
+          <path class="st" d="M0 26 H112"/>
+          <rect class="st" x="44" y="10" width="24" height="6" rx="3"/>
+          <rect class="st" x="12" y="40" width="88" height="38" rx="4"/>
+          <rect class="st" x="12" y="88" width="88" height="38" rx="4"/>
+          <rect class="st" x="12" y="136" width="88" height="62" rx="4"/>
+          <g class="fl">
+            <rect x="12" y="40" width="88" height="38" rx="4" fill="rgba(110,231,183,.13)"/>
+            <rect x="12" y="88" width="88" height="38" rx="4" fill="rgba(129,140,248,.13)"/>
+            <path d="M22 186 L40 172 L58 178 L76 158 L94 164" stroke="#6EE7B7" stroke-width="1.5" fill="none"/>
+          </g>
+        </svg>
+        <div class="cap">Phone — 1 col</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="outro" data-reveal>
+  <div class="wrap">
+    <div class="hr" style="margin-bottom:44px"></div>
+    <div class="eyebrow mono"><b>03</b> — End of prototype</div>
+    <h2>
+      <span class="lm"><span>Constraints that</span></span>
+      <span class="lm"><span><em>actually constrain.</em></span></span>
+    </h2>
+    <a class="back fd t3" href="./index.html">← Compare the other directions</a>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── reveal ── */
+/* ── reveal: monotonic scroll sweep (an anchor jump crosses no IO threshold,
+   so an observer alone can leave a skipped section invisible forever) ── */
+var revealQ=[].slice.call(document.querySelectorAll('[data-reveal]'));
+function sweep(){
+  for(var i=revealQ.length-1;i>=0;i--){
+    if(revealQ[i].getBoundingClientRect().top < innerHeight*0.92){
+      revealQ[i].classList.add('is-in'); revealQ.splice(i,1);
+    }
+  }
+}
+var sweepQueued=false;
+function sweepSoon(){ if(sweepQueued) return; sweepQueued=true;
+  requestAnimationFrame(function(){ sweep(); sweepQueued=false; }); }
+addEventListener('scroll',sweepSoon,{passive:true});
+addEventListener('resize',sweepSoon);
+addEventListener('hashchange',sweepSoon);
+sweep();
+
+/* ── stroke length calibration so every path draws at the same rate ── */
+document.querySelectorAll('.bp svg .st').forEach(function(el){
+  var len = el.getTotalLength ? el.getTotalLength() : 2000;
+  el.style.setProperty('--len', Math.ceil(len));
+});
+
+/* ── log ticker ── */
+var LINES=[
+  '<span class="d">$</span> agent.generate <span class="k">--output a2ui</span>',
+  '<span class="d">▸</span> spec.parse()      <span class="k">4 acceptance criteria</span>',
+  '<span class="d">▸</span> harness.plan()    <span class="i">6 steps queued</span>',
+  '<span class="d">▸</span> surface.emit()    <span class="k">kpi ×4 · chart · table</span>',
+  '<span class="d">▸</span> verify.kernel()   <span class="k">proven ✓</span>',
+  '<span class="d">▸</span> render.native()   <span class="i">desktop · tablet · phone</span>'
+];
+var logEl=document.getElementById('log');
+function runLog(){
+  logEl.innerHTML='';
+  var li=0;
+  function nextLine(){
+    if(li>=LINES.length){
+      setTimeout(function(){ runLog(); }, 4200);
+      return;
+    }
+    var raw=LINES[li];
+    var div=document.createElement('div'); div.className='ln';
+    logEl.appendChild(div);
+    /* type through the markup without breaking tags */
+    var plain=raw.replace(/<[^>]+>/g,'');
+    var ci=0;
+    (function step(){
+      ci++;
+      /* rebuild the prefix, re-applying spans that have opened */
+      var out='',shown=0,i=0;
+      while(i<raw.length && shown<ci){
+        if(raw[i]==='<'){ var j=raw.indexOf('>',i); out+=raw.slice(i,j+1); i=j+1; }
+        else { out+=raw[i]; i++; shown++; }
+      }
+      div.innerHTML=out+(shown<plain.length?'<span class="cur"></span>':'');
+      if(shown<plain.length) setTimeout(step, 11);
+      else { li++; setTimeout(nextLine, 260); }
+    })();
+  }
+  nextLine();
+}
+if(RM){ logEl.innerHTML = LINES.map(function(l){return '<div class="ln">'+l+'</div>';}).join(''); }
+else {
+  var logIO=new IntersectionObserver(function(es){
+    if(es[0].isIntersecting){ runLog(); logIO.disconnect(); }
+  },{threshold:.4});
+  logIO.observe(logEl);
+}
+
+/* ── count up ── */
+var counted=new WeakSet();
+var cIO=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(!e.isIntersecting || counted.has(e.target)) return;
+    counted.add(e.target);
+    var end=+e.target.dataset.count, sfx=e.target.dataset.suffix||'', t0=null;
+    if(RM){ e.target.textContent=end+sfx; return; }
+    requestAnimationFrame(function tick(ts){
+      if(!t0) t0=ts;
+      var k=Math.min(1,(ts-t0)/900), v=Math.round(end*(1-Math.pow(1-k,3)));
+      e.target.textContent=v+sfx;
+      if(k<1) requestAnimationFrame(tick);
+    });
+  });
+},{threshold:.6});
+document.querySelectorAll('[data-count]').forEach(function(el){cIO.observe(el);});
+
+/* ── index rail: progress + active section ── */
+var trk=document.getElementById('trk');
+var items=[].slice.call(document.querySelectorAll('.index .item'));
+var narrow=matchMedia('(max-width:900px)');
+var ticking=false;
+function upd(){
+  var max=document.body.scrollHeight-innerHeight;
+  var p=max>0?Math.min(1,scrollY/max):0;
+  trk.style.transform=(narrow.matches?'scaleX(':'scaleY(')+p+')';
+  var best=items[0];
+  items.forEach(function(it){
+    var t=document.getElementById(it.dataset.idx);
+    if(t && t.getBoundingClientRect().top<=innerHeight*0.42) best=it;
+  });
+  items.forEach(function(it){ it.classList.toggle('on', it===best); });
+  ticking=false;
+}
+addEventListener('scroll',function(){ if(!ticking){ticking=true;requestAnimationFrame(upd);} },{passive:true});
+addEventListener('resize',upd); upd();
+})();
+</script>
+</body>
+</html>

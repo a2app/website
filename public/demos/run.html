@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="robots" content="noindex">
+<title>A2App live demo</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #06070a; overflow: hidden; }
+  canvas.app { display: block; width: 100%; height: 100%; outline: none; }
+  .canvas_loader {
+    position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #06070a;
+    color: #8f99ad; font: 500 11px/1.4 ui-monospace, "JetBrains Mono", monospace; letter-spacing: .16em; text-transform: uppercase;
+  }
+  .canvas_loader > div { text-align: center; }
+  .bar { width: 180px; height: 2px; margin: 14px auto 0; border-radius: 2px; overflow: hidden; background: rgba(255,255,255,.08); }
+  .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #6ee7b7, #38bdf8); transition: width .15s; }
+  .err { max-width: 34ch; color: #eaeef6; text-transform: none; letter-spacing: 0; font: 400 14px/1.55 system-ui, sans-serif; }
+  .err a { color: #6ee7b7; }
+</style>
+</head>
+<body>
+<canvas class="app" id="app" tabindex="0" aria-label="Live Makepad demo"></canvas>
+<div class="canvas_loader" id="loader"><div><div id="status">Loading demo</div><div class="bar"><i id="bar"></i></div></div></div>
+<script type="module">
+// One host page for every demo. The app id comes from ?app=; the wasm ships
+// gzipped and is inflated here so no server has to negotiate compression.
+const APPS = {
+  charts: { wasm: './wasm/charts.wasm.gz', title: 'Charts' },
+  glass:  { wasm: './wasm/glass.wasm.gz',  title: 'Glass Kit' },
+  finance: { wasm: './wasm/finance.wasm.gz', title: 'Finance' },
+};
+const status = document.getElementById('status');
+const bar = document.getElementById('bar');
+const loader = document.getElementById('loader');
+
+const fail = (html) => {
+  loader.classList.remove('canvas_loader'); // keep it on screen
+  loader.innerHTML = `<div class="err">${html}</div>`;
+};
+
+const isGzip = (bytes) => bytes.length > 2 && bytes[0] === 0x1f && bytes[1] === 0x8b;
+
+async function fetchWasm(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
+  const total = Number(res.headers.get('content-length')) || 0;
+  const reader = res.body.getReader();
+  const chunks = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    received += value.length;
+    if (total) bar.style.width = `${Math.min(100, (received / total) * 100)}%`;
+  }
+  status.textContent = 'Compiling';
+  bar.style.width = '100%';
+  const blob = new Blob(chunks);
+  // A host that already applied Content-Encoding: gzip hands us plain wasm.
+  const head = new Uint8Array(await blob.slice(0, 2).arrayBuffer());
+  if (!isGzip(head)) return WebAssembly.compile(await blob.arrayBuffer());
+  if (typeof DecompressionStream !== 'function') throw new Error('unsupported');
+  const inflated = blob.stream().pipeThrough(new DecompressionStream('gzip'));
+  return WebAssembly.compile(await new Response(inflated).arrayBuffer());
+}
+
+try {
+  const id = new URLSearchParams(location.search).get('app');
+  const app = APPS[id];
+  if (!app) throw new Error('unknown');
+  document.title = `${app.title} · A2App live demo`;
+
+  window.makepad_small_font_aliases = true;
+  const [{ WasmWebGL }, module] = await Promise.all([
+    import('./makepad_platform/web_gl.js'),
+    fetchWasm(app.wasm),
+  ]);
+  const wasm = await WasmWebGL.instantiate_wasm(module, undefined, { _post_signal: () => {} });
+  if (!(wasm instanceof WebAssembly.Instance)) throw wasm;
+  status.textContent = 'Starting';
+  const canvas = document.getElementById('app');
+  new WasmWebGL(wasm, {}, canvas);
+  // the runtime removes .canvas_loader after the first presented frame
+} catch (error) {
+  const msg = String(error && error.message || error);
+  if (msg === 'unknown') fail('No such demo.');
+  else if (msg === 'unsupported') fail('This browser cannot inflate the demo. Please use a current Chrome, Safari or Firefox.');
+  else fail(`The demo could not start.<br><span style="color:#8f99ad">${msg.replace(/</g, '&lt;')}</span>`);
+  console.error(error);
+}
+</script>
+</body>
+</html>

@@ -1,35 +1,11 @@
 ---
-// Three prompts and what each one produces. No code on this page: the point of
-// A2App is that a plain request is the whole interface.
-const panels = [
-  {
-    tab: 'Dashboard',
-    user: 'Build me a sales analytics dashboard with charts and KPIs',
-    agent: 'Generating your dashboard with 4 KPI cards, a revenue trend chart, and a regional breakdown table…',
-    preview: true,
-    title: 'Dynamic Dashboards',
-    body: 'Agents compose charts, KPI cards, tables, and filters into a cohesive dashboard — all from a single prompt.',
-    points: ['Real-time data binding from your APIs', 'Interactive charts with drill-down', 'Responsive layouts across devices'],
-  },
-  {
-    tab: 'Forms',
-    user: 'Create an employee onboarding form with validation',
-    agent: 'Building a multi-step form with personal info, role assignment, and document upload sections…',
-    preview: false,
-    title: 'Smart Forms',
-    body: 'Multi-step forms with conditional logic, validation, and file uploads — generated dynamically by agents.',
-    points: ['Dynamic field generation based on context', 'Built-in validation and error handling', 'Form data flows back to agent for processing'],
-  },
-  {
-    tab: 'Data Views',
-    user: 'Show warehouse inventory with filters and a map view',
-    agent: 'Rendering inventory table with category filters and an interactive warehouse location map…',
-    preview: false,
-    title: 'Rich Data Views',
-    body: 'Tables, maps, charts, and custom components — agents choose the best visualization for the data.',
-    points: ['Custom components from your catalog', 'Interactive maps and geospatial views', 'Sortable, filterable data tables'],
-  },
-];
+// One prompt and what it produces: the real Makepad charts app, running in
+// place. No code on this page: the point of A2App is that a plain request is
+// the whole interface. The full set of demos lives on /demos.
+import DemoEmbed from './DemoEmbed.astro';
+import demos from '../data/demos.json';
+const charts = demos.find((d) => d.id === 'charts')!;
+const points = ['Real-time data binding from your APIs', 'Interactive charts with drill-down', 'Responsive layouts across devices'];
 ---
 <section class="sec" id="demo">
   <div class="wrap">
@@ -37,35 +13,22 @@ const panels = [
     <h2 data-reveal data-delay=".08">From prompt to app, <br />in seconds.</h2>
     <p class="lede" data-reveal data-delay=".16">Watch an AI agent transform a simple request into a fully interactive application.</p>
 
-    <div class="demo-wrapper" data-tabs data-reveal data-delay=".28">
-      <div class="demo-tabs" role="tablist" aria-label="Demo examples">
-        {panels.map((p, i) => (
-          <button class={`demo-tab${i === 0 ? ' active' : ''}`} type="button" role="tab" id={`tab-${i}`} aria-controls={`panel-${i}`} aria-selected={i === 0 ? 'true' : 'false'} data-tab>{p.tab}</button>
-        ))}
-      </div>
-      {panels.map((p, i) => (
-        <div class={`demo-panel${i === 0 ? ' active' : ''}`} id={`panel-${i}`} role="tabpanel" aria-labelledby={`tab-${i}`} data-panel hidden={i !== 0}>
-          <div class="demo-content">
-            <div class="demo-visual">
-              <div class="demo-bubble user">{p.user}</div>
-              <div class="demo-bubble agent">{p.agent}</div>
-              {p.preview && (
-                <div class="app-preview" aria-hidden="true">
-                  <div class="app-preview-bar"><span></span><span></span><span></span></div>
-                  <div class="app-preview-cards">
-                    <div class="app-mini-card"></div><div class="app-mini-card"></div><div class="app-mini-card"></div><div class="app-mini-card"></div>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div class="demo-text">
-              <h3>{p.title}</h3>
-              <p>{p.body}</p>
-              <ul>{p.points.map((pt) => <li>{pt}</li>)}</ul>
-            </div>
-          </div>
+    <div class="demo-wrapper" data-reveal data-delay=".24">
+      <div class="demo-content">
+        <div class="demo-visual">
+          <div class="demo-bubble user">Build me a sales analytics dashboard with charts and KPIs</div>
+          <div class="demo-bubble agent">Generating your dashboard with 4 KPI cards, a revenue trend chart, and a regional breakdown table…</div>
+          <DemoEmbed id={charts.id} title={charts.title} width={charts.width} height={charts.height} />
         </div>
-      ))}
+        <div class="demo-text">
+          <h3>Dynamic Dashboards</h3>
+          <p>Agents compose charts, KPI cards, tables, and filters into a cohesive dashboard — all from a single prompt.</p>
+          <ul>{points.map((pt) => <li>{pt}</li>)}</ul>
+        </div>
+      </div>
+    </div>
+    <div class="demo-more" data-reveal>
+      <a href="/demos" class="btn-primary">Open the live demos →</a>
     </div>
   </div>
 </section>

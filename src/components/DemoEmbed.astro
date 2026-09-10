@@ -1,0 +1,20 @@
+---
+// A live Makepad demo, loaded on demand. Shows a poster until the visitor
+// asks for it; then the real app runs in an iframe hosted by
+// public/demos/run.html. Nothing heavy downloads until the button is pressed.
+interface Props {
+  id: string;
+  title: string;
+  width: number;
+  height: number;
+  maxWidth?: number;
+}
+const { id, title, width, height, maxWidth = width } = Astro.props;
+---
+<div class="embed" data-embed={id} data-title={title} style={`aspect-ratio:${width}/${height};--embed-w:${maxWidth}px`}>
+  <img class="embed-poster" src={`/demos/posters/${id}.webp`} alt={`${title} demo, paused`} width={width} height={height} loading="lazy" decoding="async" />
+  <button class="embed-run" type="button" data-run>
+    <span class="embed-play" aria-hidden="true"></span>Run demo <span class="mono">1.8 MB</span>
+  </button>
+  <a class="embed-full" href={`/demos/run.html?app=${id}`} target="_blank" rel="noopener">Open full screen ↗</a>
+</div>

@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import DemoEmbed from '../components/DemoEmbed.astro';
+import Showcase from '../components/Showcase.astro';
+import demos from '../data/demos.json';
+---
+<Base title="Live demos — A2App" description="Real Makepad apps, compiled to WebAssembly and running in your browser.">
+  <Nav />
+  <main>
+    <section class="sec page-head">
+      <div class="wrap">
+        <div class="eyebrow" data-reveal>Live demos</div>
+        <h1 data-reveal data-delay=".08">Real apps. <em>Running right here.</em></h1>
+        <p class="lede" data-reveal data-delay=".16">These are Makepad apps compiled to WebAssembly and rendered live on this page — the same Rust-native runtime an A2App agent targets. Press Run and use them.</p>
+        <p class="page-note" data-reveal data-delay=".22">Each demo is a real app from the Makepad repository, about 2 MB to download. The line above each one is the kind of request an agent would turn into that app.</p>
+      </div>
+    </section>
+    <section class="sec">
+      <div class="wrap">
+        <div class="demo-grid">
+          {demos.map((d, i) => (
+            <article class="card demo-card" id={d.id} data-reveal data-delay={String(.1 + i * .06)}>
+              <div class="demo-copy">
+                <h3>{d.title}</h3>
+                <span class="demo-say-label">What you'd say</span>
+                <div class="demo-say">{d.say}</div>
+                <p class="blurb">{d.blurb}</p>
+                <div class="demo-links">
+                  <a class="link" href={`/demos/run.html?app=${d.id}`} target="_blank" rel="noopener">Open full screen →</a>
+                  <a class="link" href={d.source} target="_blank" rel="noopener">Source on GitHub →</a>
+                </div>
+              </div>
+              <DemoEmbed id={d.id} title={d.title} width={d.width} height={d.height} maxWidth={d.width > 900 ? d.width : 400} />
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+    <Showcase />
+  </main>
+  <Footer />
+</Base>

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "charts",
+    "title": "Charts",
+    "say": "Build me a trading dashboard with candlestick, OHLC, line and area charts",
+    "blurb": "Four chart widgets from the Makepad catalog on one surface. Every candle, grid line and fill is drawn by the Makepad renderer, not by a browser chart library.",
+    "width": 1200,
+    "height": 750,
+    "source": "https://github.com/makepad/makepad/tree/dev/examples/charts"
+  },
+  {
+    "id": "glass",
+    "title": "Glass Kit",
+    "say": "Make me a settings screen with liquid-glass toggles, buttons, a slider and filter chips",
+    "blurb": "A component showcase in Makepad's liquid-glass style. The glass refracts the animated background beneath it; toggles, the slider and the segmented control all respond to input.",
+    "width": 430,
+    "height": 880,
+    "source": "https://github.com/makepad/makepad/tree/dev/examples/glass"
+  },
+  {
+    "id": "finance",
+    "title": "Finance",
+    "say": "Build me a personal finance app with accounts, budgets and spending reports",
+    "blurb": "A complete personal-finance app: overview, transactions, budgets and reports over two years of a generated household ledger. Every screen is a real Makepad view, not a mockup.",
+    "width": 1440,
+    "height": 900,
+    "source": "https://github.com/makepad/makepad/tree/dev/apps/finance"
+  }
+]

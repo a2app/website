@@ -1,7 +1,7 @@
 /* Content sections ported from the legacy single-file site, restyled in the
    Assembled Canvas language: glass panels over the shader field. */
 
-.sec { position: relative; z-index: 2; padding: 120px 0; }
+.sec { position: relative; z-index: 2; padding: 120px 0; scroll-margin-top: 72px; }
 .sec + .sec { padding-top: 40px; }
 .eyebrow { font-size: .67rem; letter-spacing: .2em; text-transform: uppercase; color: var(--mint); margin-bottom: 14px; }
 .sec h2, .stage-title { font-size: clamp(1.9rem, 3.8vw, 3.1rem); line-height: 1.04; letter-spacing: -.032em; font-weight: 600; }
@@ -53,31 +53,11 @@
 
 /* ══ demo ══ */
 .demo-wrapper { margin-top: 40px; border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-line); background: var(--glass-bg); backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%); box-shadow: var(--glass-shadow); }
-.demo-tabs { display: flex; border-bottom: 1px solid rgba(255, 255, 255, .09); background: rgba(255, 255, 255, .03); }
-.demo-tab {
-  padding: 16px 26px; font-size: .84rem; font-weight: 500; color: var(--fg-3); background: none; border: none;
-  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: color .2s, background .2s;
-}
-.demo-tab:hover:not(.active) { color: var(--fg-2); }
-.demo-tab.active { color: var(--mint); border-bottom-color: var(--mint); background: rgba(110, 231, 183, .06); }
-.demo-panel { display: none; }
-.demo-panel.active { display: block; }
 .demo-content { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; padding: 40px; align-items: center; }
 .demo-visual { display: flex; flex-direction: column; gap: 12px; }
 .demo-bubble { font-size: .86rem; line-height: 1.55; padding: 12px 16px; border-radius: 14px; max-width: 46ch; }
 .demo-bubble.user { align-self: flex-end; background: rgba(110, 231, 183, .10); border: 1px solid rgba(110, 231, 183, .26); color: #cff6e5; border-bottom-right-radius: 4px; }
 .demo-bubble.agent { align-self: flex-start; background: var(--surface); border: 1px solid var(--line); color: var(--fg-2); border-bottom-left-radius: 4px; }
-.app-preview { margin-top: 8px; border-radius: 14px; overflow: hidden; border: 1px solid var(--glass-line); background: rgba(9, 12, 18, .4); }
-.app-preview-bar { display: flex; gap: 5px; padding: 9px 12px; border-bottom: 1px solid rgba(255, 255, 255, .09); }
-.app-preview-bar span { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .2); }
-.app-preview-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 12px; }
-.app-mini-card {
-  height: 54px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .13);
-  background: linear-gradient(160deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .02));
-}
-.app-mini-card:nth-child(1) { background: rgba(110, 231, 183, .16); border-color: rgba(110, 231, 183, .3); }
-.app-mini-card:nth-child(2) { background: rgba(129, 140, 248, .16); border-color: rgba(129, 140, 248, .3); }
-.app-mini-card:nth-child(3) { background: rgba(244, 114, 182, .13); border-color: rgba(244, 114, 182, .27); }
 .demo-text h3 { font-size: 1.25rem; font-weight: 600; letter-spacing: -.02em; margin-bottom: 12px; }
 .demo-text p { font-size: .92rem; color: var(--fg-2); line-height: 1.65; font-weight: 300; }
 .demo-text ul { list-style: none; margin-top: 18px; display: flex; flex-direction: column; gap: 9px; }
@@ -205,7 +185,6 @@ html.static [data-reveal] { opacity: 1; transform: none; }
   .factory-steps { grid-template-columns: repeat(3, 1fr); }
   .insight-list { grid-template-columns: 1fr; gap: 18px; }
   .demo-content { grid-template-columns: 1fr; padding: 28px 24px; gap: 28px; }
-  .demo-tab { padding: 14px 18px; font-size: .8rem; }
   .showcase-card { grid-template-columns: 1fr; }
   .showcase-image { border-right: none; border-bottom: 1px solid rgba(255, 255, 255, .08); }
   .trust-callout { padding: 32px 26px; }
@@ -215,5 +194,4 @@ html.static [data-reveal] { opacity: 1; transform: none; }
 @media (max-width: 600px) {
   .usecases-grid { grid-template-columns: 1fr; }
   .factory-steps { grid-template-columns: repeat(2, 1fr); }
-  .demo-tabs { overflow-x: auto; }
 }

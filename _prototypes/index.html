@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A2App — Design Direction Prototypes</title>
+<link rel="icon" type="image/svg+xml" href="./assets/a2app-favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#06070A;--surface:#12151C;--line:#1C2130;--line-2:#2A3142;
+  --fg:#EAEEF6;--fg-2:#8B95AB;--fg-3:#59627A;--mint:#6EE7B7;--indigo:#818CF8;--pink:#F472B6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--ink);color:var(--fg);
+  -webkit-font-smoothing:antialiased;min-height:100vh;
+  background-image:radial-gradient(ellipse 70% 50% at 20% 5%,rgba(110,231,183,.06),transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 80%,rgba(129,140,248,.05),transparent 60%)}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:1180px;margin:0 auto;padding:88px 26px 120px}
+.eyebrow{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);margin-bottom:18px}
+h1{font-size:clamp(2.4rem,5vw,3.7rem);line-height:1.02;letter-spacing:-.035em;font-weight:600}
+h1 em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;color:var(--mint)}
+.lede{color:var(--fg-2);font-weight:300;line-height:1.65;max-width:60ch;margin-top:20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px}
+.hero-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);margin-top:56px;
+  border-color:rgba(110,231,183,.3)}
+.hero-card .thumb{height:100%;min-height:236px;border-bottom:none;border-right:1px solid var(--line)}
+.hero-card .body{padding:34px}
+.hero-card h2{font-size:1.7rem}
+.hero-card p{font-size:.95rem}
+.t-h{background:radial-gradient(ellipse 70% 70% at 34% 44%,rgba(110,231,183,.2),transparent 62%),
+  conic-gradient(from 200deg at 42% 48%,rgba(129,140,248,.16),rgba(110,231,183,.14),rgba(244,114,182,.12),rgba(129,140,248,.16)),#080A0E}
+.t-h::before{content:'';position:absolute;left:26px;right:26px;top:44px;height:26px;border-radius:6px;
+  border:1px dashed rgba(110,231,183,.75);background:rgba(110,231,183,.07)}
+.t-h::after{content:'';position:absolute;left:26px;right:26px;top:88px;height:74px;border-radius:6px;
+  background:linear-gradient(180deg,rgba(110,231,183,.26),rgba(129,140,248,.1));
+  box-shadow:0 0 34px rgba(110,231,183,.28)}
+@media(max-width:860px){.hero-card{grid-template-columns:1fr}.hero-card .thumb{min-height:150px;border-right:none;border-bottom:1px solid var(--line)}}
+.card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  background:linear-gradient(180deg,#0D1015,#08090D);text-decoration:none;color:inherit;
+  transition:border-color .3s,transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s}
+.card:hover{border-color:var(--line-2);transform:translateY(-5px);box-shadow:0 30px 60px -30px rgba(0,0,0,.9)}
+.thumb{height:170px;position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.t-a{background:radial-gradient(ellipse 60% 60% at 30% 40%,rgba(110,231,183,.16),transparent 65%),#0A0C11}
+.t-a::after{content:'';position:absolute;left:22px;right:22px;top:56px;height:24px;border-radius:5px;
+  background:linear-gradient(90deg,rgba(110,231,183,.4),rgba(129,140,248,.3),rgba(244,114,182,.25));
+  box-shadow:0 34px 0 -6px rgba(255,255,255,.05),0 62px 0 -12px rgba(255,255,255,.03)}
+.t-b{background:conic-gradient(from 210deg at 40% 45%,rgba(110,231,183,.22),rgba(129,140,248,.26),rgba(244,114,182,.2),rgba(110,231,183,.22));
+  filter:blur(1px)}
+.t-b::after{content:'';position:absolute;inset:0;backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+  background:rgba(6,7,10,.42)}
+.t-c{background:#0A0C11;
+  background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);
+  background-size:26px 26px}
+.t-logo{background:radial-gradient(ellipse 62% 62% at 42% 46%,rgba(110,231,183,.16),transparent 64%),#080A0E;
+  display:grid;place-items:center}
+.t-logo::after{content:'';width:60%;height:54%;
+  background:no-repeat center/contain url("data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 12 228 140%22><linearGradient id=%22g%22 gradientUnits=%22userSpaceOnUse%22 x1=%2229%22 y1=%2266%22 x2=%22210%22 y2=%22128%22><stop offset=%220%22 stop-color=%22%236EE7B7%22/><stop offset=%221%22 stop-color=%22%2338BDF8%22/></linearGradient><g fill=%22none%22 stroke-width=%2211%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M18 100 L52 30 L86 100%22 stroke=%22%23EAEEF6%22/><path d=%22M29 80 L75 80%22 stroke=%22url(%23g)%22/><path d=%22M75 80 C90 80 93 60 108 60%22 stroke=%22url(%23g)%22/><path d=%22M148 80 C157 80 159 60 170 60%22 stroke=%22url(%23g)%22/><path d=%22M108 60 H128 A20 20 0 0 1 128 100 H108%22 stroke=%22url(%23g)%22/><path d=%22M108 100 L108 134%22 stroke=%22url(%23g)%22/><path d=%22M170 60 H190 A20 20 0 0 1 190 100 H170%22 stroke=%22url(%23g)%22/><path d=%22M170 100 L170 134%22 stroke=%22url(%23g)%22/></g></svg>")}
+.t-c::after{content:'Aa';position:absolute;left:24px;bottom:16px;font-family:'Instrument Serif',serif;
+  font-style:italic;font-size:4.6rem;line-height:1;color:rgba(110,231,183,.5)}
+.body{padding:24px;display:flex;flex-direction:column;flex:1}
+.key{font-size:.62rem;letter-spacing:.18em;color:var(--fg-3);margin-bottom:11px}
+.card h2{font-size:1.24rem;font-weight:600;letter-spacing:-.02em}
+.card p{color:var(--fg-2);font-weight:300;font-size:.9rem;line-height:1.62;margin-top:11px;flex:1}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px}
+.meta span{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--fg-3);
+  border:1px solid var(--line);padding:4px 9px;border-radius:100px}
+.go{margin-top:20px;font-size:.84rem;color:var(--mint);display:flex;align-items:center;gap:7px}
+.pick{margin-top:14px;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mint);
+  border:1px solid rgba(110,231,183,.3);border-radius:100px;padding:5px 11px;display:inline-block;align-self:flex-start}
+.note{margin-top:56px;border:1px solid var(--line);border-radius:14px;padding:24px 26px;background:rgba(18,21,28,.5)}
+.note h3{font-size:.95rem;font-weight:600;margin-bottom:10px}
+.note p{color:var(--fg-2);font-weight:300;font-size:.9rem;line-height:1.7}
+.note code{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--mint)}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">A2App · Redesign</div>
+  <h1>Four motion languages,<br><em>identical content.</em></h1>
+  <p class="lede">Each prototype renders the same three sections — hero, How It Works, and Cross-Device — so the only variable is how the page moves. <strong style="color:var(--fg);font-weight:500">Start with the hybrid</strong>: it merges A's assembly logic with B's atmosphere, in roughly half the scroll distance, and the app generation plays itself rather than being scrubbed.</p>
+
+  <a class="card hero-card" href="./hybrid.html">
+    <div class="thumb t-h"></div>
+    <div class="body">
+      <div class="key mono">DIRECTION A + B &nbsp;·&nbsp; LATEST</div>
+      <h2>Assembled Canvas</h2>
+      <p>A's assembly logic over B's live shader field. <strong style="color:var(--fg);font-weight:500">Scroll drives the left column only</strong> — headline and prompt. The moment the agent answers, the app builds itself on a timer: components land as dashed wireframe ghosts carrying their type label, then snap to filled while counters spin up and the chart draws. Stand still and watch it finish. Scroll on and the app breaks out of its column to 1.5&times; as the copy steps aside. <strong style="color:var(--fg);font-weight:500">653vh instead of A's 1220vh.</strong></p>
+      <div class="meta"><span>self-running build</span><span>ghost → snap</span><span>WebGL bloom</span><span>counter spin-up</span><span>chart draw</span><span>scroll-gated takeover</span></div>
+      <div class="go">Open the hybrid →</div>
+    </div>
+  </a>
+
+  <div class="grid">
+    <a class="card" href="./a-assembly.html">
+      <div class="thumb t-a"></div>
+      <div class="body">
+        <div class="key mono">DIRECTION A</div>
+        <h2>Assembly Line</h2>
+        <p>Scroll scrubs a dashboard assembling itself from a typed prompt. The motion is the demo — cards fly in and snap, bars grow, a streaming scanline sweeps the surface, then three devices split off from one.</p>
+        <div class="meta"><span>scroll-scrub</span><span>sticky pin</span><span>GSAP-ready</span></div>
+        <div class="go">Open prototype →</div>
+      </div>
+    </a>
+
+    <a class="card" href="./b-canvas.html">
+      <div class="thumb t-b"></div>
+      <div class="body">
+        <div class="key mono">DIRECTION B</div>
+        <h2>Living Canvas</h2>
+        <p>A WebGL noise field flows behind everything, bends toward your cursor, and shifts hue per section. Type splits into characters, cards tilt and catch a spotlight. Atmosphere over explanation.</p>
+        <div class="meta"><span>WebGL</span><span>split-text</span><span>magnetic tilt</span></div>
+        <div class="go">Open prototype →</div>
+      </div>
+    </a>
+
+    <a class="card" href="./c-terminal.html">
+      <div class="thumb t-c"></div>
+      <div class="body">
+        <div class="key mono">DIRECTION C</div>
+        <h2>Terminal → Interface</h2>
+        <p>Editorial restraint. Serif display type slides out from behind its own baseline, a system log types itself, schematics draw stroke by stroke, devices render as blueprints. Fastest and most accessible.</p>
+        <div class="meta"><span>line-mask</span><span>SVG draw</span><span>near-zero JS</span></div>
+        <div class="go">Open prototype →</div>
+      </div>
+    </a>
+  </div>
+
+  <a class="card hero-card" href="./logo.html" style="margin-top:22px">
+    <div class="thumb t-logo"></div>
+    <div class="body">
+      <div class="key mono">IDENTITY</div>
+      <h2>A &rarr; App</h2>
+      <p>A new mark that performs the product's claim instead of describing it: a single letterform resolves, steps aside, and the word assembles out of it in the accent gradient. White is the agent; gradient is what it generated. Includes static mark, wordmark, lockup, size ladder down to 16px, and light/dark grounds.</p>
+      <div class="meta"><span>animated wordmark</span><span>SVG</span><span>favicon-safe</span></div>
+      <div class="go">Open the logo &rarr;</div>
+    </div>
+  </a>
+
+  <div class="note">
+    <h3>What happens next</h3>
+    <p>These are throwaway comparison files — dependency-free HTML so they open straight from disk. The production build is <code>Astro + Tailwind + GSAP/ScrollTrigger</code> with all fourteen sections of a2app.ai ported as-is, and lives in <code>website/</code> alongside this folder.</p>
+  </div>
+</div>
+</body>
+</html>

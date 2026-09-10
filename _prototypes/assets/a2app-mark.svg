@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="A2App">
+  <title>A2App mark</title>
+  <defs><linearGradient id="a2m" gradientUnits="userSpaceOnUse" x1="33" y1="58" x2="67" y2="72"><stop offset="0" stop-color="#6EE7B7"/><stop offset="1" stop-color="#38BDF8"/></linearGradient></defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="11">
+    <path d="M22 82 L50 22 L78 82" stroke="#EAEEF6"/>
+    <path d="M33 65 L67 65" stroke="url(#a2m)"/>
+  </g>
+</svg>

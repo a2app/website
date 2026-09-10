@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./hero.css";
 @import "./sections.css";
+@import "./demos.css";
 
 /* Design tokens. The @theme block exposes them to Tailwind utilities
    (bg-ink, text-mint, font-mono …); the :root block keeps the short names the
@@ -123,6 +124,11 @@ html.no-gl body {
 .wrap { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 26px; position: relative; z-index: 2; }
 .pin-wrap { position: relative; z-index: 2; }
 .pin { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; align-items: center; }
+/* A pinned stage reveals itself as the reader scrolls through it, so an anchor
+   landing on its first pixel shows an empty screen. Negative scroll margin
+   lands a little way in, past the reveal, with the rest still to come. */
+html:not(.static) .pin-wrap[id] { scroll-margin-top: -30vh; }
+
 /* Flattened on narrow viewports and for reduced motion: nothing pins, nothing scrubs */
 html.static .pin-wrap { height: auto !important; }
 html.static .pin { position: static; height: auto; padding: 96px 0; display: block; overflow: visible; }

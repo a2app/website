@@ -7,6 +7,7 @@ import { initHero } from './hero';
 import { initRail, initDevices } from './stages';
 import { initProgress, initReveal, initPalettes } from './reveal';
 import { initEmbeds } from './embed';
+import { initBrandDraw } from './brand';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,6 +23,7 @@ initDevices();
 initReveal();
 initPalettes();
 initProgress();
+initBrandDraw();
 
 addEventListener('load', () => {
   ScrollTrigger.refresh();

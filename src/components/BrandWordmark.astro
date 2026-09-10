@@ -1,0 +1,44 @@
+---
+// The full A2App lockup, inlined so it inherits colour like the square mark.
+// Geometry matches brand/export.py. The A's crossbar runs through two connector
+// curves into the pair of p's: the drawing is "A to App", so it needs enough
+// height for those curves to read. Don't set it much below 30px.
+//
+// data-draw is the stroke order src/scripts/brand.ts draws them in, left to
+// right along the letterforms rather than the order they are written here.
+//
+// The two mint echoes to the left of the A are the after-image from
+// _prototypes/logo.html: the residue of the big A that shrank into this spot.
+// They read left to right, from where the letter came from through to the word
+// it became, which is why the viewBox starts at -16 rather than 0.
+interface Props { class?: string }
+const { class: className = 'wordmark' } = Astro.props;
+---
+<svg class={className} viewBox="-16 12 244 140" role="img" aria-label="A2App">
+  <defs>
+    <linearGradient id="wmg" gradientUnits="userSpaceOnUse" x1="29" y1="66" x2="210" y2="128">
+      <stop offset="0" stop-color="#6EE7B7"></stop>
+      <stop offset="1" stop-color="#38BDF8"></stop>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+    <g class="ghost" aria-hidden="true">
+      <g class="echo echo-far">
+        <path d="M18 100 L52 30 L86 100" stroke="#6EE7B7"></path>
+        <path d="M29 80 L75 80" stroke="#6EE7B7"></path>
+      </g>
+      <g class="echo echo-near">
+        <path d="M18 100 L52 30 L86 100" stroke="#6EE7B7"></path>
+        <path d="M29 80 L75 80" stroke="#6EE7B7"></path>
+      </g>
+    </g>
+    <path data-draw="1" d="M18 100 L52 30 L86 100" stroke="#EAEEF6"></path>
+    <path data-draw="2" d="M29 80 L75 80" stroke="url(#wmg)"></path>
+    <path data-draw="3" d="M75 80 C90 80 93 60 108 60" stroke="url(#wmg)"></path>
+    <path data-draw="6" d="M148 80 C157 80 159 60 170 60" stroke="url(#wmg)"></path>
+    <path data-draw="4" d="M108 60 H128 A20 20 0 0 1 128 100 H108" stroke="url(#wmg)"></path>
+    <path data-draw="5" d="M108 100 L108 134" stroke="url(#wmg)"></path>
+    <path data-draw="7" d="M170 60 H190 A20 20 0 0 1 190 100 H170" stroke="url(#wmg)"></path>
+    <path data-draw="8" d="M170 100 L170 134" stroke="url(#wmg)"></path>
+  </g>
+</svg>

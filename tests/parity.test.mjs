@@ -18,9 +18,17 @@ const squash = (s) => decode(s).replace(/\s+/g, ' ').trim();
 // - the legacy hero's agent.ts snippet — A2App is about plain verbal requests,
 //   so the page shows no code at all;
 // - the Demo section's Forms and Data Views tabs — the section now shows one
-//   real, running app (charts) instead of three mockups;
-// - the "Inspired by A2UI. Built with Makepad 2.0." (protocol) section — hidden;
-// - the "Trusted Webviews" (trust) section, and its nav link — hidden.
+//   real, running app (the data grid, on its charts tab) instead of three mockups;
+// - the "Inspired by A2UI. Built with Makepad 2.0." (protocol) section — the
+//   component was deleted once the A2UI branding came off the site;
+// - the "Trusted Webviews" (trust) section, and its nav link — hidden;
+// - every "inspired by A2UI" wording: the hero badge, the Features lede, the
+//   Get Started lede and the footer line;
+// - both footer links to a2ui.org, A2UI.org and Community;
+// - the Why Now section's blockquote, its heading and its closing paragraph.
+//   The quote was attributed to Stephen Diehl's "From Zero to QED" but appears
+//   nowhere in that book; the heading and the closing paragraph were both
+//   phrased out of it, so all three came out together.
 const OMITTED = [
   /<div class="code-preview[\s\S]*?<div class="code-body">[\s\S]*?<\/div>\s*<\/div>/,
   /<div class="demo-tabs">[\s\S]*?<\/div>/,
@@ -29,6 +37,15 @@ const OMITTED = [
   /<section id="protocol">[\s\S]*?<\/section>/,
   /<section id="trust">[\s\S]*?<\/section>/,
   /<a href="#trust">Trust<\/a>/,
+  /<div class="hero-badge">[\s\S]*?<\/div>/,
+  /<p class="section-desc fade-up delay-2">Taking inspiration from the A2UI protocol[\s\S]*?<\/p>/,
+  /<p class="section-desc fade-up delay-2" style="max-width:500px;">Start building with Makepad 2\.0[\s\S]*?<\/p>/,
+  /<p>A2App — Inspired by A2UI · Built with Makepad 2\.0<\/p>/,
+  /<a href="https:\/\/a2ui\.org" target="_blank">A2UI\.org<\/a>/,
+  /<a href="https:\/\/a2ui\.org\/ecosystem\/community\/" target="_blank">Community<\/a>/,
+  /<blockquote class="vision-quote[\s\S]*?<\/blockquote>/,
+  /<h2 class="section-title fade-up delay-1">Constraints that actually constrain\.<\/h2>/,
+  /<p class="vision-tie fade-up delay-4">[\s\S]*?<\/p>/,
 ];
 
 // The legacy <body> minus scripts, styles and the omitted blocks.
@@ -43,7 +60,7 @@ function legacyBody() {
 const visibleStrings = (html) => html.split(/<[^>]+>/).map(squash).filter((s) => /[A-Za-z]/.test(s));
 
 // Legacy content may land on either built page: the index or the live demos page.
-const builtPages = ['index.html', 'demos.html'].map((f) => path.join(here, '..', 'dist', f));
+const builtPages = ['index.html', 'demos.html', 'background.html'].map((f) => path.join(here, '..', 'dist', f));
 const builtHtml = () => builtPages.map((f) => readFileSync(f, 'utf8')).join('\n');
 
 test('built pages exist', () => {

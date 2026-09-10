@@ -1,0 +1,26 @@
+---
+// AOSF, the software factory and the Why Now argument all sit behind A2App
+// rather than in front of it, so they moved off the index and live here.
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Aosf from '../components/Aosf.astro';
+import Factory from '../components/Factory.astro';
+import Vision from '../components/Vision.astro';
+---
+<Base title="Background — A2App" description="The AOSF harness layer beneath A2App, the agentic software factory it orchestrates, and why the runtime matters now.">
+  <Nav />
+  <main>
+    <section class="sec page-head">
+      <div class="wrap">
+        <div class="eyebrow" data-reveal>Background</div>
+        <h1 data-reveal data-delay=".08">What A2App <em>stands on.</em></h1>
+        <p class="lede" data-reveal data-delay=".16">The orchestration core underneath A2App, the production line it runs, and the case for doing any of it this way. None of it is something you use directly. All of it decides what an agent is allowed to build.</p>
+      </div>
+    </section>
+    <Aosf />
+    <Factory />
+    <Vision />
+  </main>
+  <Footer />
+</Base>

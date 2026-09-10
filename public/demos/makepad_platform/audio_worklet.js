@@ -59,6 +59,18 @@ js_web_socket_send_binary(id,bin_ptr,bin_len){
 js_open_web_socket:(id,url_ptr,url_len)=>{
 }
 };
+const report=(text)=>this.port.postMessage({message_type:"console_error",value:text});
+for(const imp of WebAssembly.Module.imports(thread_info.module)){
+if(imp.module!=="env"||imp.kind!=="function"||env[imp.name]!==undefined)continue;
+const name=imp.name;
+if(name==="js_time_now"||name==="js_monotonic_now"){
+env[name]=()=>Date.now()/1000.0;
+}else if(name==="js_wake_ui"){
+env[name]=()=>this.port.postMessage({message_type:"wake_ui"});
+}else{
+env[name]=(..._args)=>{report("audio thread: "+name+" is not available on the audio thread");return 0;};
+}
+}
 WebAssembly.instantiate(thread_info.module,{env}).then(async wasm=>{
 await instantiate_secondary(wasm,env);
 wasm.exports.__stack_pointer.value=thread_info.stack_ptr;
@@ -76,6 +88,20 @@ value:"Cannot instantiate wasm"+error
 })
 }
 process(inputs,outputs,parameters){
+try{
+return this.process_inner(inputs,outputs,parameters);
+}catch(error){
+if(!this._reported){
+this._reported=true;
+this.port.postMessage({
+message_type:"console_error",
+value:"audio worklet: process threw: "+(error&&error.stack?error.stack:error)
+});
+}
+return false;
+}
+}
+process_inner(inputs,outputs,parameters){
 if(this._context!==undefined){
 let context=this._context;
 let frames=outputs[0][0].length;

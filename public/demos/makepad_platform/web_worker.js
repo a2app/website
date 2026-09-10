@@ -38,7 +38,7 @@ worker_index:makepad_worker_index
 });
 }catch(_error){
 }
-return original.apply(console,parts);
+return undefined;
 };
 }catch(_error){
 }
@@ -83,6 +83,7 @@ return out
 let web_sockets={}
 let network_web_sockets={}
 let network_http_requests=new Map();
+let worker_wait_word=new Int32Array(new SharedArrayBuffer(4));
 function id_to_key(lo,hi){
 return`${lo}:${hi}`;
 }
@@ -100,6 +101,9 @@ stack_size,
 name:u8_to_string(name_ptr,name_len)
 });
 return 1;
+},
+js_worker_wait(timeout_ms){
+Atomics.wait(worker_wait_word,0,0,timeout_ms);
 },
 js_console_error:(str_ptr,str_len)=>{
 const raw=u8_to_string(str_ptr,str_len);
@@ -229,7 +233,6 @@ body,
 signal:controller.signal,
 redirect:"manual",
 }).then(async response=>{
-console.log("[makepad][http][req]",method,url);
 let response_headers="";
 response.headers.forEach((value,key)=>{
 response_headers+=`${key}: ${value}\r\n`;
@@ -264,7 +267,9 @@ body_at+=chunk.byteLength;
 }
 let headers_u8=string_to_u8(response_headers);
 let body_u8=array_to_u8(response_body);
-console.log("[makepad][http][res]",response.status,url,response_body.length);
+if(response.status>=400){
+console.error("[makepad][http][fail]",response.status,url);
+}
 wasm.exports.wasm_network_http_response(
 request_id_lo,
 request_id_hi,

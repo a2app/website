@@ -122,19 +122,6 @@
 .showcase-actions { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 20px; }
 
 /* ══ vision ══ */
-.vision-quote {
-  position: relative; margin: 48px 0 0; padding: 40px 44px 40px 52px; border-radius: 16px;
-  border: 1px solid var(--glass-line); background: var(--glass-bg); box-shadow: var(--glass-shadow);
-  backdrop-filter: blur(12px) saturate(160%); -webkit-backdrop-filter: blur(12px) saturate(160%);
-}
-.vision-quote::before {
-  content: '\201C'; position: absolute; left: 22px; top: 10px; font-family: var(--font-serif); font-size: 5rem; line-height: 1; color: var(--mint); opacity: .5;
-}
-.vision-quote p { font-family: var(--font-serif); font-size: 1.28rem; line-height: 1.55; color: var(--fg); margin-bottom: 20px; }
-.vision-quote p:last-of-type { margin-bottom: 24px; }
-.vision-quote cite { display: block; font-style: normal; font-size: .84rem; color: var(--fg-2); }
-.vision-quote cite a { color: var(--mint); text-decoration: none; }
-.vision-quote cite a:hover { text-decoration: underline; }
 .vision-tie { margin-top: 32px; max-width: 70ch; font-size: 1.02rem; line-height: 1.65; color: var(--fg-2); font-weight: 300; }
 .vision-tie em { font-family: var(--font-serif); font-style: italic; color: var(--mint); font-size: 1.12em; }
 
@@ -168,8 +155,15 @@
 
 /* ══ footer ══ */
 .footer { position: relative; z-index: 2; border-top: 1px solid var(--line); padding: 34px 0 40px; }
-.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+/* flex-end so the link row sits on the credit line, not in the gap above it */
+.footer-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
 .footer-inner p { font-size: .8rem; color: var(--fg-3); }
+.footer-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+/* Below about 30px the connector curves between the A and the p's stop reading. */
+.footer-logo { display: block; line-height: 0; }
+.footer-logo .wordmark { height: 38px; width: auto; display: block; }
+.footer-logo:hover .wordmark { opacity: .85; }
+.footer-logo .wordmark, .footer-logo:hover .wordmark { transition: opacity .2s; }
 .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
 .footer-links a { font-size: .8rem; color: var(--fg-3); text-decoration: none; transition: color .2s; }
 .footer-links a:hover { color: var(--fg-2); }
@@ -188,8 +182,6 @@ html.static [data-reveal] { opacity: 1; transform: none; }
   .showcase-card { grid-template-columns: 1fr; }
   .showcase-image { border-right: none; border-bottom: 1px solid rgba(255, 255, 255, .08); }
   .trust-callout { padding: 32px 26px; }
-  .vision-quote { padding: 36px 26px 32px 30px; }
-  .vision-quote::before { left: 12px; top: 4px; font-size: 4rem; }
 }
 @media (max-width: 600px) {
   .usecases-grid { grid-template-columns: 1fr; }

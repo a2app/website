@@ -1,21 +1,12 @@
 [
   {
-    "id": "charts",
-    "title": "Charts",
-    "say": "Build me a trading dashboard with candlestick, OHLC, line and area charts",
-    "blurb": "Four chart widgets from the Makepad catalog on one surface. Every candle, grid line and fill is drawn by the Makepad renderer, not by a browser chart library.",
-    "width": 1200,
-    "height": 750,
-    "source": "https://github.com/makepad/makepad/tree/dev/examples/charts"
-  },
-  {
-    "id": "glass",
-    "title": "Glass Kit",
-    "say": "Make me a settings screen with liquid-glass toggles, buttons, a slider and filter chips",
-    "blurb": "A component showcase in Makepad's liquid-glass style. The glass refracts the animated background beneath it; toggles, the slider and the segmented control all respond to input.",
-    "width": 430,
-    "height": 880,
-    "source": "https://github.com/makepad/makepad/tree/dev/examples/glass"
+    "id": "datagrid",
+    "title": "Data Grids and Charts",
+    "say": "Build me a trading board with live prices, in-row sparklines and candlestick charts",
+    "blurb": "Opens on the charts tab: a price table with a sparkline drawn inside every row, a line and area chart, and candlesticks, all ticking four times a second. The other tabs run the same grid engine as a formula spreadsheet, a million rows by a thousand columns, and widgets inside cells. Every cell is drawn by the Makepad renderer, not by a browser chart library.",
+    "width": 1440,
+    "height": 900,
+    "source": "https://github.com/makepad/makepad/tree/dev/examples/datagrid"
   },
   {
     "id": "finance",
@@ -25,5 +16,14 @@
     "width": 1440,
     "height": 900,
     "source": "https://github.com/makepad/makepad/tree/dev/apps/finance"
+  },
+  {
+    "id": "glass",
+    "title": "Glass Kit",
+    "say": "Make me a settings screen with liquid-glass toggles, buttons, a slider and filter chips",
+    "blurb": "A component showcase in Makepad's liquid-glass style. The glass refracts the animated background beneath it; toggles, the slider and the segmented control all respond to input.",
+    "width": 430,
+    "height": 880,
+    "source": "https://github.com/makepad/makepad/tree/dev/examples/glass"
   }
 ]

@@ -1,10 +1,10 @@
 ---
-// One prompt and what it produces: the real Makepad charts app, running in
-// place. No code on this page: the point of A2App is that a plain request is
+// One prompt and what it produces: the real Makepad data grid, opened on its
+// charts tab, running in place. No code on this page: the point of A2App is that a plain request is
 // the whole interface. The full set of demos lives on /demos.
 import DemoEmbed from './DemoEmbed.astro';
 import demos from '../data/demos.json';
-const charts = demos.find((d) => d.id === 'charts')!;
+const demo = demos.find((d) => d.id === 'datagrid')!;
 const points = ['Real-time data binding from your APIs', 'Interactive charts with drill-down', 'Responsive layouts across devices'];
 ---
 <section class="sec" id="demo">
@@ -18,7 +18,7 @@ const points = ['Real-time data binding from your APIs', 'Interactive charts wit
         <div class="demo-visual">
           <div class="demo-bubble user">Build me a sales analytics dashboard with charts and KPIs</div>
           <div class="demo-bubble agent">Generating your dashboard with 4 KPI cards, a revenue trend chart, and a regional breakdown table…</div>
-          <DemoEmbed id={charts.id} title={charts.title} width={charts.width} height={charts.height} />
+          <DemoEmbed id={demo.id} title={demo.title} width={demo.width} height={demo.height} />
         </div>
         <div class="demo-text">
           <h3>Dynamic Dashboards</h3>

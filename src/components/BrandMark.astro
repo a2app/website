@@ -1,10 +1,15 @@
 ---
 // The square mark, inlined so it inherits colour and can be animated.
 // Geometry matches brand/export.py (display weight, 11-unit stroke).
+//
+// The two mint echoes to the left are the same after-image the footer lockup
+// carries, offset proportionally: this A is 56 units wide against the
+// wordmark's 68, so the prototype's -11 and -23 become -9 and -19. The viewBox
+// opens to the left to give them room, so the mark is no longer square.
 interface Props { class?: string }
 const { class: className = 'mark' } = Astro.props;
 ---
-<svg class={className} viewBox="0 0 100 100" aria-hidden="true">
+<svg class={className} viewBox="-14 0 114 100" aria-hidden="true">
   <defs>
     <linearGradient id="navg" gradientUnits="userSpaceOnUse" x1="33" y1="58" x2="67" y2="72">
       <stop offset="0" stop-color="#6EE7B7"></stop>
@@ -12,6 +17,16 @@ const { class: className = 'mark' } = Astro.props;
     </linearGradient>
   </defs>
   <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="11">
+    <g class="ghost">
+      <g class="echo echo-far">
+        <path d="M22 82 L50 22 L78 82" stroke="#6EE7B7"></path>
+        <path d="M33 65 L67 65" stroke="#6EE7B7"></path>
+      </g>
+      <g class="echo echo-near">
+        <path d="M22 82 L50 22 L78 82" stroke="#6EE7B7"></path>
+        <path d="M33 65 L67 65" stroke="#6EE7B7"></path>
+      </g>
+    </g>
     <path d="M22 82 L50 22 L78 82" stroke="#EAEEF6"></path>
     <path d="M33 65 L67 65" stroke="url(#navg)"></path>
   </g>

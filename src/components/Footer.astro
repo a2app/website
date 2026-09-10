@@ -1,14 +1,18 @@
 ---
+// The lockup closes the page. The nav carries the name in words; down here
+// there is room for it to be read as a drawing.
+import BrandWordmark from './BrandWordmark.astro';
 ---
 <footer class="footer">
   <div class="wrap">
     <div class="footer-inner">
-      <p>A2App — Inspired by A2UI · Built with Makepad 2.0</p>
+      <div class="footer-brand">
+        <a href="/" class="footer-logo" aria-label="A2App, home"><BrandWordmark /></a>
+        <p>Built with Makepad 2.0</p>
+      </div>
       <div class="footer-links">
         <a href="https://makepad.nl" target="_blank" rel="noopener">Makepad</a>
-        <a href="https://a2ui.org" target="_blank" rel="noopener">A2UI.org</a>
         <a href="/demos#showcase">Showcase</a>
-        <a href="https://a2ui.org/ecosystem/community/" target="_blank" rel="noopener">Community</a>
       </div>
     </div>
   </div>

@@ -17,11 +17,13 @@ npm run demos     # rebuild the live Makepad demos into public/demos (see below)
 
 ## Layout
 
-- `src/pages/index.astro` — the one page, section by section
+- `src/pages/index.astro` — the front page, section by section
 - `src/layouts/Base.astro` — head tags, fonts, the ambient layers (shader canvas, vignette, noise, cursor halo, progress bar)
 - `src/components/` — one component per section; `Hero`, `HowItWorks` and `Devices` are the pinned scroll stages
 - `src/scripts/` — `field.ts` (WebGL shader), `hero.ts` (assembly sequence), `stages.ts` (rail + devices), `reveal.ts` (progress bar, fade-up, palette drift), `nav.ts`, `demo.ts`
 - `src/styles/` — `global.css` (tokens, ambient layers, nav), `hero.css` (stages, ported from the prototype), `sections.css` (content sections)
+- `src/pages/background.astro` — AOSF, the software factory and Why Now; all three sit behind the product
+  rather than in front of it, so they were moved off the front page
 - `src/pages/demos.astro` — the live demos page; `src/data/demos.json` is the demo manifest
 - `src/components/DemoEmbed.astro` + `src/scripts/embed.ts` — poster with a Run button that swaps in an iframe on demand
 - `public/demos/` — the staged Makepad wasm apps and the shared host page `run.html`
@@ -42,11 +44,17 @@ and never rewind.
 
 The demos are real Makepad apps (from `examples/` and `apps/`) compiled to WebAssembly.
 `scripts/build-demos.sh` builds each one from a Makepad checkout (`MAKEPAD_DIR`, default
-`~/git/mp/makepad`) with
+`~/git/mp/makepad-webdemos`) with
 
 ```bash
 cargo makepad wasm build -p makepad-example-<name> --release --no-threads --strip
 ```
+
+The checkout has to be the webdemos snapshot, commit `5a9eed960`. Makepad's `dev`
+branch builds wasm that panics at init on an empty window pool, and `work` does not
+compile, so neither can produce a working demo. The script also builds cargo-makepad
+from that same checkout and uses it instead of the one on `PATH`, which may disagree
+with the tree about the font-asset manifest and refuse to package.
 
 then gzips the wasm into `public/demos/wasm/<name>.wasm.gz` and stages the runtime
 JS, the widget fonts (shared by every app) and any app resources next to it.
@@ -60,15 +68,21 @@ To add a demo: append `<id>=<crate dir>` to `DEMOS` in `scripts/build-demos.sh`,
 add an entry to `src/data/demos.json` and to `APPS` in `public/demos/run.html`,
 run `npm run demos`, and capture a poster into `public/demos/posters/<id>.webp`.
 
+A demo that needs one small change to the upstream source keeps it in
+`scripts/patches/<id>.patch`. The build applies it before compiling and reverts it
+on the way out, so the Makepad checkout is left as it was found. The data grid uses
+one to open on its charts tab rather than the spreadsheet.
+
 Apps whose `[[bin]]` name differs from the crate name (finance, sheets, task,
 image) trip cargo-makepad's packaging step, which looks for `<crate>.wasm`. The
 script works around it by copying the freshly built `<bin>.wasm` under the
 crate name and running the packaging pass again.
 
 Web builds are single-threaded, so apps that spawn threads log a harmless
-"spawn_thread is unsupported" error, and apps with the International font set
-request two CJK fonts and an emoji font that the web package leaves out; those
-requests 404 and the text falls back to IBM Plex.
+"spawn_thread is unsupported" error. The script also leaves out the two CJK faces
+and the emoji font the widget package ships, because they are 46 MB between them
+and nothing on the site shows anything but Latin text; apps that ask for them 404
+and fall back to IBM Plex.
 
 Posters are screenshots of the running apps at 2x; `tests/demos.test.mjs`
 fails if one is missing.

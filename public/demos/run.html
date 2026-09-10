@@ -26,9 +26,9 @@
 // One host page for every demo. The app id comes from ?app=; the wasm ships
 // gzipped and is inflated here so no server has to negotiate compression.
 const APPS = {
-  charts: { wasm: './wasm/charts.wasm.gz', title: 'Charts' },
   glass:  { wasm: './wasm/glass.wasm.gz',  title: 'Glass Kit' },
   finance: { wasm: './wasm/finance.wasm.gz', title: 'Finance' },
+  datagrid: { wasm: './wasm/datagrid.wasm.gz', title: 'Data Grids and Charts' },
 };
 const status = document.getElementById('status');
 const bar = document.getElementById('bar');

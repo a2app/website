@@ -1,0 +1,20 @@
+---
+---
+<section class="sec" id="trust">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>Trusted Webviews</div>
+    <h2 data-reveal data-delay=".08">Trust what you render.</h2>
+    <p class="lede" data-reveal data-delay=".16">A2App uses webviews to embed rich content — and when an agent can influence what appears inside that surface, "probably safe" isn't good enough. Prompt injection, unexpected navigation, and tampered DOM state become real attack surfaces. The engine itself needs guarantees.</p>
+
+    <div class="trust-callout" data-reveal data-delay=".22">
+      <div class="trust-badge">
+        <span class="trust-badge-icon" aria-hidden="true">🛡️</span>
+        <span class="trust-badge-label">Formal Verification</span>
+      </div>
+      <h3>formal-web</h3>
+      <p>A browser engine with a <strong>formally verified Lean kernel</strong> coordinating navigation, session history, and core engine operations — paired with Rust modules for DOM management, rendering, and system I/O. Correctness of the critical path is proven, not just tested.</p>
+      <p class="trust-why">Why it matters for A2App: when an AI agent can influence the content inside a webview, a verified kernel rules out whole classes of silent violations. This is exactly the "constraints that actually constrain" principle applied at the browser layer — extending Makepad 2.0's Rust-native guarantees into embedded web surfaces.</p>
+      <a href="https://github.com/gterzian/formal-web" target="_blank" rel="noopener" class="link">View on GitHub →</a>
+    </div>
+  </div>
+</section>

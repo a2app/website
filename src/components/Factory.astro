@@ -1,0 +1,33 @@
+---
+const steps = [
+  { num: '01', icon: '🧑‍💼', title: 'Intent', body: 'Human describes the goal in plain language', tag: 'Human', tone: 'tag-pink' },
+  { num: '02', icon: '📋', title: 'Spec', body: 'AOSF translates intent into formal requirements & acceptance criteria', tag: 'AOSF', tone: 'tag-mint' },
+  { num: '03', icon: '⚙️', title: 'Harness', body: 'AOSF Core orchestrates workflow engine and agent coordination', tag: 'AOSF Core', tone: 'tag-mint' },
+  { num: '04', icon: '🤖', title: 'Agent execution', body: 'Coding, test, and security agents produce the software', tag: 'AI Agents', tone: 'tag-indigo' },
+  { num: '05', icon: '🔍', title: 'Verification', body: 'Static analysis, formal verification, and fuzzing — run by AI agents against AOSF quality standards', tag: 'AI Agents', tone: 'tag-indigo' },
+  { num: '06', icon: '🚀', title: 'Release', body: 'Secure, auditable software ships to production', tag: 'Output', tone: 'tag-amber' },
+];
+---
+<section class="sec" id="factory">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>AI Software Factory</div>
+    <h2 data-reveal data-delay=".08">Six steps from <em>intent</em><br />to <em>release</em>.</h2>
+    <p class="lede" data-reveal data-delay=".16">The agentic software production pipeline — from a human expressing intent, through AOSF's harness orchestrating agents, to verified and auditable output.</p>
+
+    <div class="factory-steps">
+      {steps.map((s, i) => (
+        <div class="card factory-step" data-reveal data-delay={String(.2 + i * .05)}>
+          <div class="num">{s.num}</div>
+          <div class="icon" aria-hidden="true">{s.icon}</div>
+          <h4>{s.title}</h4>
+          <p>{s.body}</p>
+          <span class={`tag ${s.tone}`}>{s.tag}</span>
+        </div>
+      ))}
+    </div>
+    <div class="factory-output" data-reveal data-delay=".5">
+      <span class="label">Sustainable output →</span>
+      <span class="desc">Secure, auditable, compliant software — produced without offices, engineers, or code repositories</span>
+    </div>
+  </div>
+</section>

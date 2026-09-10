@@ -1,0 +1,18 @@
+---
+// The square mark, inlined so it inherits colour and can be animated.
+// Geometry matches brand/export.py (display weight, 11-unit stroke).
+interface Props { class?: string }
+const { class: className = 'mark' } = Astro.props;
+---
+<svg class={className} viewBox="0 0 100 100" aria-hidden="true">
+  <defs>
+    <linearGradient id="navg" gradientUnits="userSpaceOnUse" x1="33" y1="58" x2="67" y2="72">
+      <stop offset="0" stop-color="#6EE7B7"></stop>
+      <stop offset="1" stop-color="#38BDF8"></stop>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="11">
+    <path d="M22 82 L50 22 L78 82" stroke="#EAEEF6"></path>
+    <path d="M33 65 L67 65" stroke="url(#navg)"></path>
+  </g>
+</svg>

@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A2App — Agent to App</title>
+<!-- Favicons -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#07080A">
+<meta name="apple-mobile-web-app-title" content="A2App">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07080A;
+  --bg-subtle: #0D0F13;
+  --surface: #13161C;
+  --surface-hover: #1A1E26;
+  --border: #1E2330;
+  --border-accent: #2A3040;
+  --text: #E8ECF4;
+  --text-muted: #8892A6;
+  --text-dim: #5A6378;
+  --accent: #6EE7B7;
+  --accent-glow: #34D399;
+  --accent-dim: rgba(110,231,183,0.08);
+  --accent2: #818CF8;
+  --accent3: #F472B6;
+  --gradient-1: linear-gradient(135deg, #6EE7B7, #34D399, #059669);
+  --gradient-2: linear-gradient(135deg, #818CF8, #6366F1);
+  --gradient-3: linear-gradient(135deg, #F472B6, #EC4899);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border-accent); border-radius:3px; }
+
+/* ─── Canvas BG ─── */
+.canvas-bg {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(110,231,183,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(129,140,248,0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(244,114,182,0.02) 0%, transparent 60%);
+}
+
+/* ─── Grid Pattern ─── */
+.grid-pattern {
+  position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.025;
+  background-image:
+    linear-gradient(var(--text) 1px, transparent 1px),
+    linear-gradient(90deg, var(--text) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 30%, black, transparent);
+}
+
+/* ─── Utility ─── */
+.container { max-width:1200px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+.serif { font-family:'Instrument Serif', serif; }
+.mono { font-family:'JetBrains Mono', monospace; }
+
+/* ─── Fade-in animation ─── */
+.fade-up {
+  opacity:0; transform:translateY(30px);
+  animation: fadeUp 0.8s ease forwards;
+}
+@keyframes fadeUp {
+  to { opacity:1; transform:translateY(0); }
+}
+.delay-1 { animation-delay:0.1s; }
+.delay-2 { animation-delay:0.2s; }
+.delay-3 { animation-delay:0.3s; }
+.delay-4 { animation-delay:0.4s; }
+.delay-5 { animation-delay:0.5s; }
+.delay-6 { animation-delay:0.6s; }
+.delay-7 { animation-delay:0.7s; }
+
+/* ─── NAV ─── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  padding:16px 0;
+  background: rgba(7,8,10,0.7);
+  backdrop-filter: blur(20px);
+  border-bottom:1px solid var(--border);
+}
+nav .container {
+  display:flex; align-items:center; justify-content:space-between;
+}
+.nav-logo {
+  display:flex; align-items:center; gap:10px;
+  font-weight:700; font-size:1.25rem; color:var(--text);
+  text-decoration:none;
+}
+.nav-logo .logo-mark {
+  width:36px; height:36px; border-radius:var(--radius-xs);
+  background: var(--gradient-1);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:0.85rem; color:var(--bg);
+}
+.nav-links { display:flex; align-items:center; justify-content:flex-end; gap:20px; flex-wrap:nowrap; }
+.nav-links a {
+  color:var(--text-muted); text-decoration:none; font-size:0.9rem;
+  font-weight:500; transition:color 0.2s;
+}
+.nav-links a:hover { color:var(--text); }
+.nav-cta {
+  padding:8px 20px; border-radius:999px;
+  background:var(--accent); color:var(--bg);
+  font-weight:600; font-size:0.85rem;
+  text-decoration:none; transition:all 0.2s;
+  margin-left:8px;
+}
+.nav-cta:hover { background:var(--accent-glow); transform:translateY(-1px); }
+
+.mobile-menu { display:none; background:none; border:none; color:var(--text); cursor:pointer; }
+
+/* ─── HERO ─── */
+.hero {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  text-align:center; padding:120px 24px 80px;
+  position:relative;
+}
+.hero-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 16px 6px 8px; border-radius:999px;
+  background:var(--accent-dim); border:1px solid rgba(110,231,183,0.15);
+  font-size:0.8rem; color:var(--accent); font-weight:500;
+  margin-bottom:32px;
+}
+.hero-badge .dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--accent);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(110,231,183,0.4); }
+  50% { opacity:0.8; box-shadow:0 0 0 6px rgba(110,231,183,0); }
+}
+.hero h1 {
+  font-family:'Instrument Serif', serif;
+  font-size:clamp(3rem, 8vw, 6.5rem);
+  line-height:1.05; font-weight:400;
+  letter-spacing:-0.02em;
+  margin-bottom:28px;
+  max-width:900px;
+}
+.hero h1 em {
+  font-style:italic;
+  background: var(--gradient-1);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub {
+  font-size:clamp(1.05rem, 2vw, 1.3rem);
+  color:var(--text-muted); line-height:1.6;
+  max-width:640px; margin:0 auto 48px;
+  font-weight:300;
+}
+.hero-actions { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+.btn-primary {
+  padding:14px 32px; border-radius:999px;
+  background:var(--accent); color:var(--bg);
+  font-weight:600; font-size:1rem; border:none; cursor:pointer;
+  text-decoration:none; transition:all 0.25s;
+  box-shadow:0 0 30px rgba(110,231,183,0.15);
+}
+.btn-primary:hover {
+  background:var(--accent-glow);
+  box-shadow:0 0 50px rgba(110,231,183,0.25);
+  transform:translateY(-2px);
+}
+.btn-secondary {
+  padding:14px 32px; border-radius:999px;
+  background:transparent; color:var(--text);
+  font-weight:500; font-size:1rem; border:1px solid var(--border-accent);
+  cursor:pointer; text-decoration:none; transition:all 0.25s;
+}
+.btn-secondary:hover {
+  background:var(--surface); border-color:var(--text-dim);
+}
+
+/* ─── Floating orb ─── */
+.hero-orb {
+  position:absolute; width:500px; height:500px; border-radius:50%;
+  background: radial-gradient(circle, rgba(110,231,183,0.06) 0%, transparent 70%);
+  top:10%; left:50%; transform:translateX(-50%);
+  animation: orbFloat 8s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes orbFloat {
+  0%,100% { transform:translateX(-50%) translateY(0); }
+  50% { transform:translateX(-50%) translateY(-30px); }
+}
+
+/* ─── CODE PREVIEW ─── */
+.code-preview {
+  max-width:700px; margin:60px auto 0;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden;
+  text-align:left;
+}
+.code-header {
+  display:flex; align-items:center; gap:8px;
+  padding:12px 16px; border-bottom:1px solid var(--border);
+}
+.code-dot { width:10px; height:10px; border-radius:50%; }
+.code-dot:nth-child(1) { background:#FF605C; }
+.code-dot:nth-child(2) { background:#FFBD44; }
+.code-dot:nth-child(3) { background:#00CA4E; }
+.code-header span {
+  margin-left:auto; font-size:0.75rem; color:var(--text-dim);
+  font-family:'JetBrains Mono', monospace;
+}
+.code-body {
+  padding:20px; font-family:'JetBrains Mono', monospace;
+  font-size:0.82rem; line-height:1.8; color:var(--text-muted);
+  overflow-x:auto;
+}
+.code-body .kw { color:var(--accent2); }
+.code-body .fn { color:var(--accent); }
+.code-body .str { color:var(--accent3); }
+.code-body .cm { color:var(--text-dim); }
+.code-body .op { color:var(--text); }
+
+/* ─── SECTION STYLES ─── */
+section { padding:120px 0; position:relative; }
+.section-label {
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.75rem; font-weight:500; letter-spacing:0.1em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:16px;
+}
+.section-title {
+  font-family:'Instrument Serif', serif;
+  font-size:clamp(2rem, 4vw, 3.2rem);
+  line-height:1.15; font-weight:400;
+  margin-bottom:20px; max-width:700px;
+  letter-spacing:-0.01em;
+}
+.section-desc {
+  font-size:1.05rem; color:var(--text-muted);
+  line-height:1.7; max-width:600px; font-weight:300;
+}
+
+/* ─── HOW IT WORKS ─── */
+.flow-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+  margin-top:64px; border-radius:var(--radius); overflow:hidden;
+}
+.flow-step {
+  background:var(--surface); padding:40px 32px;
+  position:relative; transition:background 0.3s;
+}
+.flow-step:hover { background:var(--surface-hover); }
+.flow-number {
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.7rem; font-weight:500; color:var(--accent);
+  margin-bottom:20px; letter-spacing:0.08em;
+}
+.flow-icon {
+  width:48px; height:48px; border-radius:var(--radius-sm);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:20px; font-size:1.4rem;
+}
+.flow-step:nth-child(1) .flow-icon { background:rgba(110,231,183,0.1); }
+.flow-step:nth-child(2) .flow-icon { background:rgba(129,140,248,0.1); }
+.flow-step:nth-child(3) .flow-icon { background:rgba(244,114,182,0.1); }
+.flow-step h3 {
+  font-size:1.15rem; font-weight:600; margin-bottom:12px;
+}
+.flow-step p {
+  font-size:0.9rem; color:var(--text-muted); line-height:1.65;
+}
+
+/* ─── FEATURES ─── */
+.features-grid {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:2px;
+  margin-top:64px; border-radius:var(--radius); overflow:hidden;
+}
+.feature-card {
+  background:var(--surface); padding:48px 40px;
+  transition:background 0.3s; position:relative;
+}
+.feature-card:hover { background:var(--surface-hover); }
+.feature-tag {
+  display:inline-block; padding:4px 10px; border-radius:999px;
+  font-size:0.7rem; font-weight:600; letter-spacing:0.05em;
+  text-transform:uppercase; margin-bottom:20px;
+}
+.feature-card:nth-child(1) .feature-tag { background:rgba(110,231,183,0.1); color:var(--accent); }
+.feature-card:nth-child(2) .feature-tag { background:rgba(129,140,248,0.1); color:var(--accent2); }
+.feature-card:nth-child(3) .feature-tag { background:rgba(244,114,182,0.1); color:var(--accent3); }
+.feature-card:nth-child(4) .feature-tag { background:rgba(251,191,36,0.1); color:#FBBf24; }
+.feature-card h3 {
+  font-family:'Instrument Serif', serif;
+  font-size:1.5rem; font-weight:400; margin-bottom:14px;
+}
+.feature-card p {
+  font-size:0.92rem; color:var(--text-muted); line-height:1.65;
+}
+
+/* ─── DEMO SECTION ─── */
+.demo-wrapper {
+  margin-top:64px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden;
+}
+.demo-tabs {
+  display:flex; border-bottom:1px solid var(--border);
+}
+.demo-tab {
+  flex:1; padding:16px; text-align:center; font-size:0.85rem;
+  font-weight:500; color:var(--text-dim); cursor:pointer;
+  border:none; background:none; transition:all 0.2s;
+  border-bottom:2px solid transparent;
+}
+.demo-tab.active { color:var(--accent); border-bottom-color:var(--accent); background:var(--accent-dim); }
+.demo-tab:hover:not(.active) { color:var(--text-muted); }
+.demo-panel {
+  padding:40px; display:none; min-height:320px;
+  align-items:center; justify-content:center;
+}
+.demo-panel.active { display:flex; }
+.demo-content {
+  display:grid; grid-template-columns:1fr 1fr; gap:40px; width:100%;
+  align-items:center;
+}
+.demo-visual {
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:32px;
+  display:flex; flex-direction:column; gap:16px;
+}
+.demo-chat-bubble {
+  padding:12px 16px; border-radius:var(--radius-sm);
+  font-size:0.85rem; line-height:1.5; max-width:85%;
+}
+.bubble-user {
+  background:rgba(129,140,248,0.1); color:var(--accent2);
+  align-self:flex-end; border-bottom-right-radius:4px;
+}
+.bubble-agent {
+  background:rgba(110,231,183,0.08); color:var(--accent);
+  align-self:flex-start; border-bottom-left-radius:4px;
+}
+.demo-app-preview {
+  background: var(--bg); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:24px;
+}
+.app-preview-bar {
+  display:flex; gap:8px; margin-bottom:16px;
+}
+.app-preview-bar span {
+  height:8px; border-radius:4px; background:var(--border-accent);
+}
+.app-preview-bar span:nth-child(1) { width:30%; }
+.app-preview-bar span:nth-child(2) { width:50%; background:var(--accent); opacity:0.3; }
+.app-preview-bar span:nth-child(3) { width:20%; }
+.app-preview-cards {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+}
+.app-mini-card {
+  height:60px; border-radius:var(--radius-xs);
+  border:1px solid var(--border);
+  background:var(--surface);
+  position:relative; overflow:hidden;
+}
+.app-mini-card::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+}
+.app-mini-card:nth-child(1)::after { background:var(--accent); }
+.app-mini-card:nth-child(2)::after { background:var(--accent2); }
+.app-mini-card:nth-child(3)::after { background:var(--accent3); }
+.app-mini-card:nth-child(4)::after { background:#FBBf24; }
+
+.demo-text h3 { font-size:1.2rem; font-weight:600; margin-bottom:12px; }
+.demo-text p { font-size:0.9rem; color:var(--text-muted); line-height:1.65; }
+.demo-text ul {
+  list-style:none; margin-top:16px; display:flex; flex-direction:column; gap:10px;
+}
+.demo-text ul li {
+  font-size:0.85rem; color:var(--text-muted);
+  display:flex; align-items:flex-start; gap:10px;
+}
+.demo-text ul li::before {
+  content:'→'; color:var(--accent); font-weight:700; flex-shrink:0;
+}
+
+/* ─── CROSS DEVICE ─── */
+.devices-showcase {
+  margin-top:64px;
+  display:flex; align-items:flex-end; justify-content:center; gap:24px;
+  perspective:1000px;
+}
+.device {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden;
+  transition:transform 0.4s ease;
+}
+.device:hover { transform:translateY(-8px); }
+.device-desktop { width:420px; }
+.device-tablet { width:260px; }
+.device-phone { width:150px; }
+.device-bar {
+  height:32px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 12px; gap:6px;
+}
+.device-bar-dot { width:7px; height:7px; border-radius:50%; background:var(--border-accent); }
+.device-screen { padding:16px; min-height:180px; }
+.device-phone .device-screen { min-height:220px; padding:12px; }
+.screen-header {
+  height:10px; width:50%; background:var(--border-accent); border-radius:5px; margin-bottom:12px;
+}
+.screen-row {
+  display:flex; gap:8px; margin-bottom:8px;
+}
+.screen-block {
+  height:24px; border-radius:4px; background:var(--border);
+}
+.screen-block.accent { background:rgba(110,231,183,0.15); }
+.screen-block.accent2 { background:rgba(129,140,248,0.15); }
+.screen-block.accent3 { background:rgba(244,114,182,0.15); }
+.screen-block.w1 { width:30%; } .screen-block.w2 { width:50%; }
+.screen-block.w3 { width:70%; } .screen-block.w4 { width:100%; }
+.screen-block.h2 { height:48px; } .screen-block.h3 { height:64px; }
+
+/* ─── USE CASES ─── */
+.usecases-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
+  margin-top:64px;
+}
+.usecase {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:32px 28px;
+  transition:all 0.3s;
+}
+.usecase:hover {
+  border-color:var(--border-accent); transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+}
+.usecase-icon {
+  font-size:1.8rem; margin-bottom:16px;
+}
+.usecase h3 { font-size:1.05rem; font-weight:600; margin-bottom:10px; }
+.usecase p { font-size:0.85rem; color:var(--text-muted); line-height:1.6; }
+
+/* ─── SHOWCASE ─── */
+.showcase-grid {
+  display:grid; grid-template-columns:1fr; gap:24px;
+  margin-top:64px; max-width:860px;
+  margin-left:auto; margin-right:auto;
+}
+.showcase-card {
+  display:grid; grid-template-columns:220px 1fr;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden;
+  text-decoration:none; color:inherit;
+  transition:all 0.3s;
+}
+.showcase-card:hover {
+  border-color:var(--border-accent); transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+}
+.showcase-image {
+  background: radial-gradient(circle at 50% 50%, rgba(110,231,183,0.12), rgba(129,140,248,0.05) 60%, transparent 80%);
+  padding:36px; display:flex; align-items:center; justify-content:center;
+  border-right:1px solid var(--border);
+}
+.showcase-image img {
+  width:128px; height:128px; border-radius:var(--radius-sm);
+  box-shadow:0 12px 40px rgba(0,0,0,0.4);
+  object-fit:contain; background:var(--bg-subtle);
+}
+.showcase-glyph {
+  width:128px; height:128px; border-radius:var(--radius-sm);
+  background:var(--bg-subtle); border:1px solid var(--border);
+  box-shadow:0 12px 40px rgba(0,0,0,0.4);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:10px;
+}
+.showcase-glyph-icon { font-size:2.4rem; line-height:1; }
+.showcase-glyph-label {
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.7rem; color:var(--accent2);
+  letter-spacing:0.03em;
+}
+.showcase-content { padding:28px 32px; display:flex; flex-direction:column; }
+.showcase-tag {
+  display:inline-block; align-self:flex-start;
+  padding:4px 10px; border-radius:999px;
+  font-size:0.7rem; font-weight:600; letter-spacing:0.05em;
+  text-transform:uppercase; margin-bottom:14px;
+  background:rgba(110,231,183,0.1); color:var(--accent);
+}
+.showcase-content h3 {
+  font-family:'Instrument Serif', serif;
+  font-size:1.6rem; font-weight:400; margin-bottom:10px;
+}
+.showcase-content p {
+  font-size:0.92rem; color:var(--text-muted); line-height:1.65;
+  margin-bottom:18px;
+}
+.showcase-meta {
+  display:flex; gap:16px; flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.showcase-meta span {
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.72rem; color:var(--text-dim);
+}
+.showcase-actions {
+  display:flex; gap:20px; flex-wrap:wrap;
+  margin-top:auto; align-items:center;
+}
+.showcase-link {
+  font-size:0.85rem; color:var(--accent); font-weight:500;
+  text-decoration:none;
+  transition:color 0.2s;
+}
+.showcase-link:hover { color:var(--accent-glow); }
+.showcase-title-link {
+  color:inherit; text-decoration:none;
+  transition:color 0.2s;
+}
+.showcase-title-link:hover { color:var(--accent); }
+.showcase-image { display:flex; }
+@media (max-width:700px) {
+  .showcase-card { grid-template-columns:1fr; }
+  .showcase-image { border-right:none; border-bottom:1px solid var(--border); padding:40px; }
+}
+
+/* ─── VISION ─── */
+.vision-quote {
+  margin:56px auto 36px; max-width:780px;
+  padding:48px 48px 40px;
+  background:var(--surface); border:1px solid var(--border);
+  border-left:3px solid var(--accent);
+  border-radius:var(--radius);
+  position:relative;
+}
+.vision-quote::before {
+  content:'\201C';
+  position:absolute; top:-8px; left:24px;
+  font-family:'Instrument Serif', serif;
+  font-size:5rem; color:var(--accent); opacity:0.6;
+  line-height:1;
+}
+.vision-quote p {
+  font-family:'Instrument Serif', serif;
+  font-style:italic; font-size:1.28rem;
+  line-height:1.55; color:var(--text);
+  margin-bottom:20px; font-weight:400;
+}
+.vision-quote p:last-of-type { margin-bottom:28px; }
+.vision-quote cite {
+  display:block;
+  font-family:'JetBrains Mono', monospace;
+  font-style:normal; font-size:0.76rem;
+  color:var(--text-dim); letter-spacing:0.02em;
+}
+.vision-quote cite a {
+  color:var(--accent); text-decoration:none;
+}
+.vision-quote cite a:hover { text-decoration:underline; }
+.vision-tie {
+  max-width:720px; margin:0 auto;
+  text-align:center;
+  font-size:1rem; color:var(--text-muted);
+  line-height:1.7;
+}
+.vision-tie em {
+  font-style:italic; color:var(--accent);
+  font-family:'Instrument Serif', serif;
+  font-size:1.15em;
+}
+@media (max-width:600px) {
+  .vision-quote { padding:36px 28px 32px; }
+  .vision-quote p { font-size:1.1rem; }
+  .vision-quote::before { font-size:4rem; left:16px; }
+}
+
+/* ─── TRUST ─── */
+.trust-callout {
+  margin-top:56px; max-width:860px;
+  margin-left:auto; margin-right:auto;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden;
+  position:relative;
+}
+.trust-callout::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:2px;
+  background:var(--gradient-2);
+}
+.trust-callout-inner { padding:44px 48px; }
+.trust-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 14px; border-radius:999px;
+  background:rgba(129,140,248,0.1);
+  border:1px solid rgba(129,140,248,0.2);
+  margin-bottom:24px;
+}
+.trust-badge-icon { font-size:0.85rem; }
+.trust-badge-label {
+  font-size:0.7rem; font-weight:600;
+  letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--accent2);
+}
+.trust-callout h3 {
+  font-family:'JetBrains Mono', monospace;
+  font-size:1.5rem; font-weight:500;
+  color:var(--text); margin-bottom:16px;
+  letter-spacing:-0.01em;
+}
+.trust-callout p {
+  font-size:0.95rem; color:var(--text-muted);
+  line-height:1.7; margin-bottom:18px;
+}
+.trust-callout p strong {
+  color:var(--text); font-weight:600;
+}
+.trust-why {
+  padding:20px 22px;
+  background:var(--bg-subtle);
+  border-left:3px solid var(--accent2);
+  border-radius:var(--radius-xs);
+  font-size:0.88rem !important;
+  margin-bottom:24px !important;
+}
+.trust-link {
+  display:inline-block;
+  font-size:0.9rem; color:var(--accent);
+  font-weight:500; text-decoration:none;
+  padding:10px 20px; border-radius:999px;
+  border:1px solid var(--border-accent);
+  transition:all 0.25s;
+}
+.trust-link:hover {
+  background:var(--surface-hover);
+  border-color:var(--text-dim);
+  color:var(--text);
+}
+@media (max-width:600px) {
+  .trust-callout-inner { padding:32px 24px; }
+  .trust-callout h3 { font-size:1.25rem; }
+}
+
+/* ─── PROTOCOL REFERENCE ─── */
+.protocol-block {
+  margin-top:64px;
+  display:grid; grid-template-columns:1fr 1fr; gap:2px;
+  border-radius:var(--radius); overflow:hidden;
+}
+.protocol-card {
+  background:var(--surface); padding:40px;
+  transition:background 0.3s;
+}
+.protocol-card:hover { background:var(--surface-hover); }
+.protocol-card h3 {
+  font-size:1.1rem; font-weight:600; margin-bottom:10px;
+  display:flex; align-items:center; gap:10px;
+}
+.protocol-card .version {
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.65rem; padding:3px 8px; border-radius:999px;
+  background:rgba(110,231,183,0.1); color:var(--accent);
+}
+.protocol-card p { font-size:0.88rem; color:var(--text-muted); line-height:1.6; }
+
+/* ─── CTA ─── */
+.cta-section {
+  text-align:center;
+  padding:140px 24px;
+}
+.cta-section .section-title {
+  margin:0 auto 20px; max-width:600px;
+}
+.cta-section .section-desc {
+  margin:0 auto 48px;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  border-top:1px solid var(--border);
+  padding:40px 0;
+}
+.footer-inner {
+  display:flex; align-items:center; justify-content:space-between;
+}
+.footer-inner p { font-size:0.8rem; color:var(--text-dim); }
+.footer-links { display:flex; gap:24px; }
+.footer-links a {
+  font-size:0.8rem; color:var(--text-dim); text-decoration:none;
+  transition:color 0.2s;
+}
+.footer-links a:hover { color:var(--text-muted); }
+
+/* ─── AOSF LAYERS ─── */
+.aosf-layers-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:2px;
+  margin-top:64px; border-radius:var(--radius); overflow:hidden;
+}
+.aosf-layer {
+  background:var(--surface); padding:40px 36px;
+  transition:background 0.3s; position:relative;
+}
+.aosf-layer:hover { background:var(--surface-hover); }
+.aosf-layer.featured {
+  border:1px solid rgba(110,231,183,0.2);
+  background:rgba(110,231,183,0.03);
+}
+.aosf-layer.featured:hover { background:rgba(110,231,183,0.06); }
+.layer-num {
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.7rem; font-weight:500; color:var(--text-dim);
+  margin-bottom:14px; letter-spacing:0.08em;
+}
+.aosf-layer h3 {
+  font-size:1.1rem; font-weight:600; margin-bottom:10px;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.aosf-layer p { font-size:0.88rem; color:var(--text-muted); line-height:1.65; }
+.layer-badge {
+  font-size:0.65rem; font-weight:600; letter-spacing:0.06em;
+  text-transform:uppercase; padding:3px 10px; border-radius:999px;
+}
+.badge-green { background:rgba(110,231,183,0.12); color:var(--accent); }
+.badge-purple { background:rgba(129,140,248,0.12); color:var(--accent2); }
+.badge-pink { background:rgba(244,114,182,0.12); color:var(--accent3); }
+.badge-dim { background:rgba(90,99,120,0.15); color:var(--text-muted); }
+.aosf-insight {
+  grid-column:1 / -1;
+  background:var(--surface); padding:36px 40px;
+  border-top:2px solid rgba(110,231,183,0.15);
+}
+.aosf-insight-label {
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.7rem; font-weight:500; color:var(--accent);
+  letter-spacing:0.08em; text-transform:uppercase; margin-bottom:20px;
+}
+.aosf-insight-list {
+  display:flex; gap:40px; flex-wrap:wrap;
+}
+.aosf-insight-item {
+  font-size:0.88rem; color:var(--text-muted); line-height:1.65; max-width:260px;
+}
+.aosf-insight-item strong { color:var(--text); font-weight:600; }
+.aosf-cta-link {
+  display:inline-flex; align-items:center; gap:8px;
+  margin-top:24px; padding:10px 22px; border-radius:999px;
+  border:1px solid var(--border-accent);
+  font-size:0.88rem; color:var(--accent); font-weight:500;
+  text-decoration:none; transition:all 0.25s;
+}
+.aosf-cta-link:hover { background:var(--surface-hover); border-color:var(--text-dim); color:var(--text); }
+
+/* ─── AI SOFTWARE FACTORY ─── */
+.factory-steps {
+  display:grid; grid-template-columns:repeat(6,1fr); gap:2px;
+  margin-top:64px; border-radius:var(--radius) var(--radius) 0 0; overflow:hidden;
+}
+.factory-step {
+  background:var(--surface); padding:28px 20px 32px;
+  transition:background 0.3s; position:relative;
+}
+.factory-step:hover { background:var(--surface-hover); }
+.factory-step-num {
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.65rem; color:var(--text-dim); margin-bottom:14px;
+}
+.factory-step-icon {
+  font-size:1.4rem; margin-bottom:14px; display:block;
+}
+.factory-step h4 { font-size:0.92rem; font-weight:600; margin-bottom:6px; }
+.factory-step p { font-size:0.78rem; color:var(--text-muted); line-height:1.5; }
+.factory-step-tag {
+  display:inline-block; margin-top:12px; padding:2px 9px; border-radius:999px;
+  font-size:0.65rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase;
+}
+.tag-human { background:rgba(244,114,182,0.1); color:var(--accent3); }
+.tag-aosf  { background:rgba(110,231,183,0.1); color:var(--accent); }
+.tag-ai    { background:rgba(129,140,248,0.1); color:var(--accent2); }
+.tag-out   { background:rgba(251,191,36,0.1); color:#FBBf24; }
+.factory-output {
+  background:var(--surface); padding:28px 40px;
+  border-radius:0 0 var(--radius) var(--radius);
+  border-top:2px solid rgba(110,231,183,0.15);
+  display:flex; align-items:center; justify-content:center; gap:16px;
+  flex-wrap:wrap;
+}
+.factory-output-label {
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.8rem; font-weight:500; color:var(--accent);
+}
+.factory-output-desc {
+  font-size:0.88rem; color:var(--text-muted);
+}
+
+/* ─── Responsive ─── */
+/* Nav collapses to burger earlier than the rest of the layout — 10+ links don't fit comfortably on mid-size laptops. */
+@media (max-width:1100px) {
+  .nav-links {
+    display:flex;
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+    gap:0;
+    background: rgba(7,8,10,0.96);
+    backdrop-filter: blur(20px);
+    border-bottom:1px solid var(--border);
+    padding:8px 0;
+    max-height:calc(100vh - 70px);
+    overflow-y:auto;
+    /* Closed state — animated */
+    opacity:0;
+    transform:translateY(-8px);
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .nav-links.open {
+    opacity:1;
+    transform:translateY(0);
+    visibility:visible;
+    pointer-events:auto;
+    transition:opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0s;
+  }
+  .nav-links a {
+    padding:14px 24px;
+    font-size:0.95rem;
+    border-bottom:1px solid var(--border);
+  }
+  .nav-links a:last-child { border-bottom:none; }
+  .nav-cta {
+    margin:10px 24px 4px;
+    padding:12px 20px;
+    text-align:center;
+    border-bottom:none !important;
+  }
+  .mobile-menu { display:block; font-size:1.4rem; padding:4px 8px; }
+}
+@media (max-width:900px) {
+  .flow-grid, .features-grid, .protocol-block { grid-template-columns:1fr; }
+  .usecases-grid { grid-template-columns:1fr; }
+  .demo-content { grid-template-columns:1fr; }
+  .devices-showcase { flex-direction:column; align-items:center; }
+  .device-desktop { width:100%; max-width:420px; }
+  .device-tablet { width:100%; max-width:260px; }
+  .device-phone { width:100%; max-width:150px; }
+  .aosf-layers-grid { grid-template-columns:1fr; }
+  .factory-steps { grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width:600px) {
+  .hero-actions { flex-direction:column; align-items:center; }
+  .feature-card { padding:32px 24px; }
+  .flow-step { padding:32px 24px; }
+  .factory-steps { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="canvas-bg"></div>
+<div class="grid-pattern"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <a href="#" class="nav-logo">
+      <div class="logo-mark">A2</div>
+      A2App
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#features">Features</a>
+      <a href="#demo">Demo</a>
+      <a href="#devices">Cross-Device</a>
+      <a href="#usecases">Use Cases</a>
+      <a href="#showcase">Showcase</a>
+      <a href="#aosf">AOSF</a>
+      <a href="#factory">Factory</a>
+      <a href="#vision">Why Now</a>
+      <a href="#trust">Trust</a>
+      <a href="https://makepad.nl" target="_blank" class="nav-cta">Makepad 2.0 →</a>
+    </div>
+    <button class="mobile-menu" aria-label="Toggle menu" aria-expanded="false" onclick="(function(b){var n=document.querySelector('.nav-links');var open=n.classList.toggle('open');b.setAttribute('aria-expanded',open);b.textContent=open?'✕':'☰';})(this)">☰</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-orb"></div>
+  <div class="container">
+    <div class="fade-up">
+      <div class="hero-badge"><span class="dot"></span> Inspired by A2UI · Powered by Makepad 2.0</div>
+    </div>
+    <h1 class="fade-up delay-1">From <em>Agent</em><br>to <em>App</em></h1>
+    <p class="hero-sub fade-up delay-2">
+      AI Agents don't just chat anymore — they build entire apps. Dynamic, interactive interfaces generated on-the-fly, rendered natively across every device.
+    </p>
+    <div class="hero-actions fade-up delay-3">
+      <a href="#demo" class="btn-primary">See It in Action</a>
+    </div>
+
+    <div class="code-preview fade-up delay-4">
+      <div class="code-header">
+        <div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div>
+        <span>agent.ts</span>
+      </div>
+      <div class="code-body">
+<span class="cm">// Your agent describes UI — the client renders it natively</span><br>
+<span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">agent</span>.<span class="fn">generate</span>({<br>
+&nbsp;&nbsp;prompt: <span class="str">"Build a dashboard for sales analytics"</span>,<br>
+&nbsp;&nbsp;output: <span class="str">"a2ui"</span>, <span class="cm">// declarative UI, not code</span><br>
+});<br><br>
+<span class="cm">// Streams rich components — charts, tables, forms</span><br>
+<span class="cm">// Renders on web, mobile, desktop — same response</span><br>
+<span class="kw">await</span> <span class="fn">surface</span>.<span class="fn">render</span>(response.<span class="op">components</span>);
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-label fade-up">How It Works</div>
+    <h2 class="section-title fade-up delay-1">Agent thinks. App appears.</h2>
+    <p class="section-desc fade-up delay-2">Three steps from natural language intent to a fully interactive application, rendered natively on any platform.</p>
+
+    <div class="flow-grid fade-up delay-3">
+      <div class="flow-step">
+        <div class="flow-number">01</div>
+        <div class="flow-icon">💬</div>
+        <h3>Describe What You Need</h3>
+        <p>Tell the agent what you want in plain language. A booking form, a data dashboard, an inventory tracker — anything.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-number">02</div>
+        <div class="flow-icon">🧠</div>
+        <h3>Agent Generates UI</h3>
+        <p>The AI agent produces declarative UI components — structured data, not executable code. Safe, streamable, and framework-agnostic.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-number">03</div>
+        <div class="flow-icon">✨</div>
+        <h3>Native Rendering</h3>
+        <p>Your client renders the UI using its own native widgets — Angular, React, Flutter, or mobile. Same response, every platform.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="section-label fade-up">Core Capabilities</div>
+    <h2 class="section-title fade-up delay-1">Not just chat. <br>Full applications.</h2>
+    <p class="section-desc fade-up delay-2">Taking inspiration from the A2UI protocol and running on Makepad 2.0, A2App turns AI agents into app generators — secure, declarative, and universal.</p>
+
+    <div class="features-grid fade-up delay-3">
+      <div class="feature-card">
+        <div class="feature-tag">Security</div>
+        <h3>Declarative, Not Executable</h3>
+        <p>Agents send structured component descriptions — never raw code. No injection attacks, no sandbox escapes. Your catalog controls what's allowed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-tag">Streaming</div>
+        <h3>Progressive Rendering</h3>
+        <p>UIs build in real-time as the agent generates them. Users see the interface materializing — no waiting for complete responses.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-tag">Universal</div>
+        <h3>One Response, Every Platform</h3>
+        <p>A single agent output renders natively on web, iOS, Android, and desktop. Your design system, your components, every device.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-tag">Interactive</div>
+        <h3>Two-Way Communication</h3>
+        <p>Users interact with generated UIs — fill forms, click buttons, manipulate data — and actions flow back to the agent for dynamic responses.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo">
+  <div class="container">
+    <div class="section-label fade-up">See It Work</div>
+    <h2 class="section-title fade-up delay-1">From prompt to app, <br>in seconds.</h2>
+    <p class="section-desc fade-up delay-2">Watch an AI agent transform a simple request into a fully interactive application.</p>
+
+    <div class="demo-wrapper fade-up delay-3">
+      <div class="demo-tabs">
+        <button class="demo-tab active" onclick="switchTab(0)">Dashboard</button>
+        <button class="demo-tab" onclick="switchTab(1)">Forms</button>
+        <button class="demo-tab" onclick="switchTab(2)">Data Views</button>
+      </div>
+
+      <div class="demo-panel active" id="panel-0">
+        <div class="demo-content">
+          <div class="demo-visual">
+            <div class="demo-chat-bubble bubble-user">Build me a sales analytics dashboard with charts and KPIs</div>
+            <div class="demo-chat-bubble bubble-agent">Generating your dashboard with 4 KPI cards, a revenue trend chart, and a regional breakdown table…</div>
+            <div class="demo-app-preview">
+              <div class="app-preview-bar"><span></span><span></span><span></span></div>
+              <div class="app-preview-cards">
+                <div class="app-mini-card"></div>
+                <div class="app-mini-card"></div>
+                <div class="app-mini-card"></div>
+                <div class="app-mini-card"></div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-text">
+            <h3>Dynamic Dashboards</h3>
+            <p>Agents compose charts, KPI cards, tables, and filters into a cohesive dashboard — all from a single prompt.</p>
+            <ul>
+              <li>Real-time data binding from your APIs</li>
+              <li>Interactive charts with drill-down</li>
+              <li>Responsive layouts across devices</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-panel" id="panel-1">
+        <div class="demo-content">
+          <div class="demo-visual">
+            <div class="demo-chat-bubble bubble-user">Create an employee onboarding form with validation</div>
+            <div class="demo-chat-bubble bubble-agent">Building a multi-step form with personal info, role assignment, and document upload sections…</div>
+          </div>
+          <div class="demo-text">
+            <h3>Smart Forms</h3>
+            <p>Multi-step forms with conditional logic, validation, and file uploads — generated dynamically by agents.</p>
+            <ul>
+              <li>Dynamic field generation based on context</li>
+              <li>Built-in validation and error handling</li>
+              <li>Form data flows back to agent for processing</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-panel" id="panel-2">
+        <div class="demo-content">
+          <div class="demo-visual">
+            <div class="demo-chat-bubble bubble-user">Show warehouse inventory with filters and a map view</div>
+            <div class="demo-chat-bubble bubble-agent">Rendering inventory table with category filters and an interactive warehouse location map…</div>
+          </div>
+          <div class="demo-text">
+            <h3>Rich Data Views</h3>
+            <p>Tables, maps, charts, and custom components — agents choose the best visualization for the data.</p>
+            <ul>
+              <li>Custom components from your catalog</li>
+              <li>Interactive maps and geospatial views</li>
+              <li>Sortable, filterable data tables</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CROSS DEVICE -->
+<section id="devices">
+  <div class="container" style="text-align:center;">
+    <div class="section-label fade-up">Cross-Device</div>
+    <h2 class="section-title fade-up delay-1" style="margin:0 auto 20px;">One agent response.<br>Every screen.</h2>
+    <p class="section-desc fade-up delay-2" style="margin:0 auto;">The same declarative UI renders natively on desktop, tablet, and mobile — using each platform's own design system and components.</p>
+
+    <div class="devices-showcase fade-up delay-3">
+      <div class="device device-desktop">
+        <div class="device-bar"><div class="device-bar-dot"></div><div class="device-bar-dot"></div><div class="device-bar-dot"></div></div>
+        <div class="device-screen">
+          <div class="screen-header"></div>
+          <div class="screen-row"><div class="screen-block w2 accent"></div><div class="screen-block w2 accent2"></div></div>
+          <div class="screen-row"><div class="screen-block w4 h2"></div></div>
+          <div class="screen-row"><div class="screen-block w3 accent3"></div><div class="screen-block w1"></div></div>
+          <div class="screen-row"><div class="screen-block w4 h2"></div></div>
+        </div>
+      </div>
+      <div class="device device-tablet">
+        <div class="device-bar"><div class="device-bar-dot"></div><div class="device-bar-dot"></div><div class="device-bar-dot"></div></div>
+        <div class="device-screen">
+          <div class="screen-header"></div>
+          <div class="screen-row"><div class="screen-block w4 accent h2"></div></div>
+          <div class="screen-row"><div class="screen-block w2"></div><div class="screen-block w2 accent2"></div></div>
+          <div class="screen-row"><div class="screen-block w4 h3 accent3"></div></div>
+        </div>
+      </div>
+      <div class="device device-phone">
+        <div class="device-bar"><div class="device-bar-dot"></div><div class="device-bar-dot"></div><div class="device-bar-dot"></div></div>
+        <div class="device-screen">
+          <div class="screen-header"></div>
+          <div class="screen-row"><div class="screen-block w4 accent h2"></div></div>
+          <div class="screen-row"><div class="screen-block w4 h2 accent2"></div></div>
+          <div class="screen-row"><div class="screen-block w3"></div></div>
+          <div class="screen-row"><div class="screen-block w4 h3 accent3"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section id="usecases">
+  <div class="container">
+    <div class="section-label fade-up">Use Cases</div>
+    <h2 class="section-title fade-up delay-1">What will your agent build?</h2>
+    <p class="section-desc fade-up delay-2">From internal tools to customer-facing products — agents can generate any interface on demand.</p>
+
+    <div class="usecases-grid fade-up delay-3">
+      <div class="usecase">
+        <div class="usecase-icon">📊</div>
+        <h3>Business Intelligence</h3>
+        <p>Ask your agent for reports and get interactive dashboards with live charts, drill-downs, and export capabilities.</p>
+      </div>
+      <div class="usecase">
+        <div class="usecase-icon">🏗️</div>
+        <h3>Internal Tools</h3>
+        <p>Generate admin panels, approval workflows, and operational dashboards without a line of frontend code.</p>
+      </div>
+      <div class="usecase">
+        <div class="usecase-icon">🛒</div>
+        <h3>Customer Interfaces</h3>
+        <p>Dynamic product configurators, booking flows, and support interfaces — personalized per user.</p>
+      </div>
+      <div class="usecase">
+        <div class="usecase-icon">🗺️</div>
+        <h3>Geospatial Apps</h3>
+        <p>Location pickers, route planners, and map-driven analytics rendered with native map components.</p>
+      </div>
+      <div class="usecase">
+        <div class="usecase-icon">📋</div>
+        <h3>Data Collection</h3>
+        <p>Dynamic forms that adapt based on user input — with validation, conditional logic, and submission handling.</p>
+      </div>
+      <div class="usecase">
+        <div class="usecase-icon">🤖</div>
+        <h3>Multi-Agent Orchestration</h3>
+        <p>Agents collaborating to build complex UIs — one handles data, another handles layout, a third manages styling.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AOSF -->
+<section id="aosf">
+  <div class="container">
+    <div class="section-label fade-up">Strategic Infrastructure</div>
+    <h2 class="section-title fade-up delay-1">Meet <em>AOSF</em> —<br>the Harness Layer</h2>
+    <p class="section-desc fade-up delay-2">The <a href="https://aosf.ai" target="_blank" style="color:var(--accent); text-decoration:none; border-bottom:1px solid rgba(110,231,183,0.35);">Agentic Open Source Foundation</a> provides the orchestration core that makes A2App possible. In the four-layer model of agentic software production, AOSF owns the most strategic position: the Harness — the layer that controls everything beneath it.</p>
+
+    <div class="aosf-layers-grid fade-up delay-3">
+
+      <div class="aosf-layer" style="border-left:2px solid rgba(244,114,182,0.2);">
+        <div class="layer-num">01 / SPEC LAYER</div>
+        <h3>Human defines intent <span class="layer-badge badge-pink">Human</span></h3>
+        <p>Intent, requirements, and acceptance criteria. Where every project begins — the human articulates what needs to be built.</p>
+      </div>
+
+      <div class="aosf-layer featured">
+        <div class="layer-num">02 / HARNESS LAYER</div>
+        <h3>Orchestration &amp; workflow <span class="layer-badge badge-green">AOSF Core ★</span></h3>
+        <p>The strategic control plane. AOSF owns the workflow engine, agent coordination, and process IP. <strong style="color:var(--accent);">Who controls the Harness, controls the economy.</strong> Agents are replaceable — the Harness is not.</p>
+        <a class="aosf-cta-link" href="https://aosf.ai" target="_blank">Visit AOSF →</a>
+      </div>
+
+      <div class="aosf-layer">
+        <div class="layer-num">03 / AGENT LAYER</div>
+        <h3>AI execution <span class="layer-badge badge-purple">Replaceable</span></h3>
+        <p>Coding agents, test agents, security agents. The AI workers that carry out tasks — orchestrated by the Harness. GPT, Claude, Gemini: swap freely.</p>
+      </div>
+
+      <div class="aosf-layer">
+        <div class="layer-num">04 / VERIFICATION LAYER</div>
+        <h3>Quality assurance <span class="layer-badge badge-dim">Automated</span></h3>
+        <p>Static analysis, formal verification, and fuzzing. Every agent output is validated before release — correctness proven, not just tested.</p>
+      </div>
+
+      <div class="aosf-insight">
+        <div class="aosf-insight-label">Key insight</div>
+        <div class="aosf-insight-list">
+          <div class="aosf-insight-item"><strong>We don't own agents</strong> — they're replaceable commodities. The model you use today will be superseded tomorrow.</div>
+          <div class="aosf-insight-item"><strong>We own the Harness</strong> — process IP, governance framework, and quality standards. Strategic, durable competitive advantage.</div>
+          <div class="aosf-insight-item"><strong>We invest in token compute</strong> — not offices, engineers, or code repos. A true asset-light factory model.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FACTORY -->
+<section id="factory">
+  <div class="container">
+    <div class="section-label fade-up">AI Software Factory</div>
+    <h2 class="section-title fade-up delay-1">Six steps from <em>intent</em><br>to <em>release</em>.</h2>
+    <p class="section-desc fade-up delay-2">The agentic software production pipeline — from a human expressing intent, through AOSF's harness orchestrating agents, to verified and auditable output.</p>
+
+    <div class="fade-up delay-3">
+      <div class="factory-steps">
+
+        <div class="factory-step">
+          <div class="factory-step-num">01</div>
+          <span class="factory-step-icon">🧑‍💼</span>
+          <h4>Intent</h4>
+          <p>Human describes the goal in plain language</p>
+          <span class="factory-step-tag tag-human">Human</span>
+        </div>
+
+        <div class="factory-step">
+          <div class="factory-step-num">02</div>
+          <span class="factory-step-icon">📋</span>
+          <h4>Spec</h4>
+          <p>AOSF translates intent into formal requirements &amp; acceptance criteria</p>
+          <span class="factory-step-tag tag-aosf">AOSF</span>
+        </div>
+
+        <div class="factory-step">
+          <div class="factory-step-num">03</div>
+          <span class="factory-step-icon">⚙️</span>
+          <h4>Harness</h4>
+          <p>AOSF Core orchestrates workflow engine and agent coordination</p>
+          <span class="factory-step-tag tag-aosf">AOSF Core</span>
+        </div>
+
+        <div class="factory-step">
+          <div class="factory-step-num">04</div>
+          <span class="factory-step-icon">🤖</span>
+          <h4>Agent execution</h4>
+          <p>Coding, test, and security agents produce the software</p>
+          <span class="factory-step-tag tag-ai">AI Agents</span>
+        </div>
+
+        <div class="factory-step">
+          <div class="factory-step-num">05</div>
+          <span class="factory-step-icon">🔍</span>
+          <h4>Verification</h4>
+          <p>Static analysis, formal verification, and fuzzing — run by AI agents against AOSF quality standards</p>
+          <span class="factory-step-tag tag-ai">AI Agents</span>
+        </div>
+
+        <div class="factory-step">
+          <div class="factory-step-num">06</div>
+          <span class="factory-step-icon">🚀</span>
+          <h4>Release</h4>
+          <p>Secure, auditable software ships to production</p>
+          <span class="factory-step-tag tag-out">Output</span>
+        </div>
+
+      </div>
+      <div class="factory-output">
+        <span class="factory-output-label">Sustainable output →</span>
+        <span class="factory-output-desc">Secure, auditable, compliant software — produced without offices, engineers, or code repositories</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SHOWCASE -->
+<section id="showcase">
+  <div class="container">
+    <div class="section-label fade-up">Showcase</div>
+    <h2 class="section-title fade-up delay-1">Real-world examples</h2>
+    <p class="section-desc fade-up delay-2">Projects bringing A2App's ideas to life — from Makepad 2.0 native apps to prompt-injection-resistant agent runtimes.</p>
+
+    <div class="showcase-grid fade-up delay-3">
+      <article class="showcase-card">
+        <a href="https://robrix.app" target="_blank" class="showcase-image" aria-label="Visit Robrix">
+          <img src="https://raw.githubusercontent.com/project-robius/robrix/main/resources/icon_256.png" alt="Robrix app icon" />
+        </a>
+        <div class="showcase-content">
+          <span class="showcase-tag">Matrix Client</span>
+          <h3><a href="https://robrix.app" target="_blank" class="showcase-title-link">Robrix</a></h3>
+          <p>A multi-platform Matrix chat client written in Rust, exemplifying Project Robius with Makepad 2.0. One codebase ships natively to macOS, Windows, Linux, iOS, and Android.</p>
+          <div class="showcase-meta">
+            <span>Rust</span>
+            <span>Makepad 2.0</span>
+            <span>Project Robius</span>
+          </div>
+          <div class="showcase-actions">
+            <a href="https://github.com/project-robius/robrix" target="_blank" class="showcase-link">View on GitHub →</a>
+            <a href="https://robrix.app" target="_blank" class="showcase-link">Download →</a>
+          </div>
+        </div>
+      </article>
+
+      <a href="https://github.com/gterzian/lsp_agent" target="_blank" class="showcase-card">
+        <div class="showcase-image">
+          <div class="showcase-glyph">
+            <span class="showcase-glyph-icon">🔒</span>
+            <span class="showcase-glyph-label">lsp_agent</span>
+          </div>
+        </div>
+        <div class="showcase-content">
+          <span class="showcase-tag">Agent Runtime</span>
+          <h3>lsp_agent</h3>
+          <p>A <strong>prompt-injection-resistant agent runtime</strong>. A VS Code extension where an AI agent (GitHub Copilot) writes and launches web applications into a webview — with all inference and file access gatekept by a privileged LSP server, and Automerge coordinating isolated processes. This is the A2App pattern in practice: agents describe the app, a hardened runtime enforces the rules.</p>
+          <div class="showcase-meta">
+            <span>Rust</span>
+            <span>LSP</span>
+            <span>Automerge</span>
+            <span>Injection-Resistant</span>
+          </div>
+          <div class="showcase-link">View on GitHub →</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- VISION -->
+<section id="vision">
+  <div class="container">
+    <div class="section-label fade-up">Why Now</div>
+    <h2 class="section-title fade-up delay-1">Constraints that actually constrain.</h2>
+    <p class="section-desc fade-up delay-2">When AI agents generate interfaces, the runtime does the hard work. Rust's guarantees and Makepad 2.0's declarative model give agents expressive freedom — without giving up the rules.</p>
+
+    <blockquote class="vision-quote fade-up delay-3">
+      <p>The practical question is not whether to allow AI agents in markets but how to make them work well. Formal verification offers something concrete: constraints that actually constrain, rules that cannot be silently violated, guarantees that hold regardless of what the model learned.</p>
+      <p>If these trends continue, we may be witnessing another industrial revolution. Before mechanization, most work in the physics sense of force times distance was done by muscles. The steam engine and its descendants changed that. Most thinking used to be done by brains. In the near or far future, that may change too. This is not inevitable. It presumes breakthroughs that are plausible but not guaranteed. But the trajectory is clear enough to take seriously.</p>
+      <cite>— Stephen Diehl, <a href="https://sdiehl.github.io/zero-to-qed/22_artificial_intelligence.html" target="_blank">Zero to QED</a>, Ch. 22 "What Comes Next"</cite>
+    </blockquote>
+
+    <p class="vision-tie fade-up delay-4">This is the bet behind A2App + Makepad 2.0: agents describe <em>what</em> the UI should be; a Rust-native, declarative runtime enforces <em>how</em> it behaves. Expressive freedom for the model, hard guarantees for the user — apps that cannot be silently violated, no matter what the agent learned.</p>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section id="trust">
+  <div class="container">
+    <div class="section-label fade-up">Trusted Webviews</div>
+    <h2 class="section-title fade-up delay-1">Trust what you render.</h2>
+    <p class="section-desc fade-up delay-2">A2App uses webviews to embed rich content — and when an agent can influence what appears inside that surface, "probably safe" isn't good enough. Prompt injection, unexpected navigation, and tampered DOM state become real attack surfaces. The engine itself needs guarantees.</p>
+
+    <div class="trust-callout fade-up delay-3">
+      <div class="trust-callout-inner">
+        <div class="trust-badge">
+          <span class="trust-badge-icon">🛡️</span>
+          <span class="trust-badge-label">Formal Verification</span>
+        </div>
+        <h3>formal-web</h3>
+        <p>A browser engine with a <strong>formally verified Lean kernel</strong> coordinating navigation, session history, and core engine operations — paired with Rust modules for DOM management, rendering, and system I/O. Correctness of the critical path is proven, not just tested.</p>
+        <p class="trust-why">Why it matters for A2App: when an AI agent can influence the content inside a webview, a verified kernel rules out whole classes of silent violations. This is exactly the "constraints that actually constrain" principle applied at the browser layer — extending Makepad 2.0's Rust-native guarantees into embedded web surfaces.</p>
+        <a href="https://github.com/gterzian/formal-web" target="_blank" class="trust-link">View on GitHub →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROTOCOL REFERENCE -->
+<section id="protocol">
+  <div class="container">
+    <div class="section-label fade-up">Inspiration & Stack</div>
+    <h2 class="section-title fade-up delay-1">Inspired by A2UI. <br>Built with Makepad 2.0.</h2>
+    <p class="section-desc fade-up delay-2">A2App draws inspiration from Google's open A2UI protocol for declarative, agent-driven interfaces — and brings those ideas to life with Makepad 2.0, a Rust-native UI runtime that renders across desktop, mobile, and web.</p>
+
+    <div class="protocol-block fade-up delay-3">
+      <div class="protocol-card">
+        <h3>A2UI Concepts <span class="version">Inspiration</span></h3>
+        <p>Declarative components, surfaces, data binding, and the adjacency list model for streaming UIs — borrowed as design inspiration, not as a runtime dependency.</p>
+      </div>
+      <div class="protocol-card">
+        <h3>Makepad 2.0 <span class="version">UI Runtime</span></h3>
+        <p>A high-performance Rust UI framework with a reactive DSL, live reloading, and GPU-accelerated rendering — the engine behind every A2App surface.</p>
+      </div>
+      <div class="protocol-card">
+        <h3>Component Catalogs <span class="version">Custom</span></h3>
+        <p>Define which UI components agents can use. Control the visual vocabulary — your design system, your rules.</p>
+      </div>
+      <div class="protocol-card">
+        <h3>MCP Integration <span class="version">Interop</span></h3>
+        <p>Use A2App surfaces over MCP for rich tool responses, embed MCP tools inside surfaces, or combine both.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="section-label fade-up">Get Started</div>
+    <h2 class="section-title fade-up delay-1" style="max-width:600px;">Ready to turn agents into apps?</h2>
+    <p class="section-desc fade-up delay-2" style="max-width:500px;">Start building with Makepad 2.0, inspired by A2UI concepts. Open source, Rust-native, and production-ready.</p>
+    <div class="hero-actions fade-up delay-3">
+      <a href="https://makepad.nl" target="_blank" class="btn-primary">Start Building →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <p>A2App — Inspired by A2UI · Built with Makepad 2.0</p>
+      <div class="footer-links">
+        <a href="https://makepad.nl" target="_blank">Makepad</a>
+        <a href="https://a2ui.org" target="_blank">A2UI.org</a>
+        <a href="#showcase">Showcase</a>
+        <a href="https://a2ui.org/ecosystem/community/" target="_blank">Community</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function switchTab(index) {
+  document.querySelectorAll('.demo-tab').forEach((t,i) => t.classList.toggle('active', i===index));
+  document.querySelectorAll('.demo-panel').forEach((p,i) => p.classList.toggle('active', i===index));
+}
+
+// Scroll-triggered fade-in
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.animationPlayState = 'running';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-up').forEach(el => {
+  el.style.animationPlayState = 'paused';
+  observer.observe(el);
+});
+
+// Mobile menu helpers
+function closeMobileMenu() {
+  const n = document.querySelector('.nav-links');
+  const b = document.querySelector('.mobile-menu');
+  if (n && n.classList.contains('open')) {
+    n.classList.remove('open');
+    if (b) { b.setAttribute('aria-expanded', 'false'); b.textContent = '☰'; }
+  }
+}
+
+// Close when a link is tapped
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('click', closeMobileMenu);
+});
+
+// Close when tapping outside the menu/button
+document.addEventListener('click', (e) => {
+  const n = document.querySelector('.nav-links');
+  const b = document.querySelector('.mobile-menu');
+  if (!n || !n.classList.contains('open')) return;
+  if (n.contains(e.target) || (b && b.contains(e.target))) return;
+  closeMobileMenu();
+});
+
+// Close on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeMobileMenu();
+});
+</script>
+
+</body>
+</html>

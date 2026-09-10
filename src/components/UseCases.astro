@@ -1,0 +1,26 @@
+---
+const cases = [
+  { icon: '📊', title: 'Business Intelligence', body: 'Ask your agent for reports and get interactive dashboards with live charts, drill-downs, and export capabilities.' },
+  { icon: '🏗️', title: 'Internal Tools', body: 'Generate admin panels, approval workflows, and operational dashboards without a line of frontend code.' },
+  { icon: '🛒', title: 'Customer Interfaces', body: 'Dynamic product configurators, booking flows, and support interfaces — personalized per user.' },
+  { icon: '🗺️', title: 'Geospatial Apps', body: 'Location pickers, route planners, and map-driven analytics rendered with native map components.' },
+  { icon: '📋', title: 'Data Collection', body: 'Dynamic forms that adapt based on user input — with validation, conditional logic, and submission handling.' },
+  { icon: '🤖', title: 'Multi-Agent Orchestration', body: 'Agents collaborating to build complex UIs — one handles data, another handles layout, a third manages styling.' },
+];
+---
+<section class="sec" id="usecases">
+  <div class="wrap">
+    <div class="eyebrow" data-reveal>Use Cases</div>
+    <h2 data-reveal data-delay=".08">What will your agent build?</h2>
+    <p class="lede" data-reveal data-delay=".16">From internal tools to customer-facing products — agents can generate any interface on demand.</p>
+    <div class="usecases-grid">
+      {cases.map((c, i) => (
+        <div class="card" data-reveal data-delay={String(.2 + i * .05)}>
+          <div class="icon" aria-hidden="true">{c.icon}</div>
+          <h3>{c.title}</h3>
+          <p>{c.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

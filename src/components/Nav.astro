@@ -1,0 +1,24 @@
+---
+import BrandMark from './BrandMark.astro';
+
+const links = [
+  { href: '#how-it-works', label: 'How It Works' },
+  { href: '#features', label: 'Features' },
+  { href: '#demo', label: 'Demo' },
+  { href: '#devices', label: 'Cross-Device' },
+  { href: '#usecases', label: 'Use Cases' },
+  { href: '#showcase', label: 'Showcase' },
+  { href: '#aosf', label: 'AOSF' },
+  { href: '#factory', label: 'Factory' },
+  { href: '#vision', label: 'Why Now' },
+  { href: '#trust', label: 'Trust' },
+];
+---
+<nav class="nav" aria-label="Primary">
+  <a href="#" class="nav-logo"><BrandMark />A2App</a>
+  <div class="nav-links">
+    {links.map((l) => <a href={l.href}>{l.label}</a>)}
+    <a href="https://makepad.nl" target="_blank" rel="noopener" class="nav-cta">Makepad 2.0 →</a>
+  </div>
+  <button class="mobile-menu" type="button" aria-label="Toggle menu" aria-expanded="false">☰</button>
+</nav>

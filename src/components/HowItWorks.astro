@@ -1,0 +1,40 @@
+---
+// Pinned rail: the three steps deal themselves out along a drawn connector.
+const steps = [
+  { icon: '💬', num: '01 / INTENT', title: 'Describe What You Need', body: 'Tell the agent what you want in plain language. A booking form, a data dashboard, an inventory tracker — anything.' },
+  { icon: '🧠', num: '02 / GENERATE', title: 'Agent Generates UI', body: 'The AI agent produces declarative UI components — structured data, not executable code. Safe, streamable, and framework-agnostic.' },
+  { icon: '✨', num: '03 / RENDER', title: 'Native Rendering', body: 'Your client renders the UI using its own native widgets — Angular, React, Flutter, or mobile. Same response, every platform.' },
+];
+---
+<section class="pin-wrap" id="how-it-works" data-rail data-palette="1" style="height:180vh">
+  <div class="pin">
+    <div class="wrap">
+      <div class="eyebrow" data-rc>How It Works</div>
+      <h2 class="stage-title" data-rc>Agent thinks. <em>App appears.</em></h2>
+      <p class="lede" data-rc>Three steps from natural language intent to a fully interactive application, rendered natively on any platform.</p>
+      <div class="rail">
+        <svg class="conn" preserveAspectRatio="none" viewBox="0 0 1000 4" aria-hidden="true">
+          <defs>
+            <linearGradient id="rg" gradientUnits="userSpaceOnUse" x1="67" y1="60" x2="190" y2="60">
+              <stop offset="0" stop-color="#6EE7B7"></stop><stop offset=".34" stop-color="#818CF8"></stop><stop offset="1" stop-color="#F472B6"></stop>
+            </linearGradient>
+          </defs>
+          <line class="track2" x1="95" y1="2" x2="905" y2="2"></line>
+          <line class="live2" id="live2" x1="95" y1="2" x2="905" y2="2" stroke-dasharray="810" stroke-dashoffset="810"></line>
+        </svg>
+        <div class="nodes">
+          {steps.map((s) => (
+            <div class="node" data-node data-tilt>
+              <div class="node-in">
+                <div class="dot">{s.icon}</div>
+                <div class="num mono">{s.num}</div>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

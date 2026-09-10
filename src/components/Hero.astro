@@ -1,0 +1,114 @@
+---
+// The assembly stage. Scroll (or a short grace period) types the prompt; the
+// agent answers; the app assembles component by component; at the climax it
+// breaks out of its column. Driven by src/scripts/hero.ts.
+const kpis = [
+  { label: 'Revenue', zero: '$0.00M', d: 'M0 16 L20 12 L40 14 L60 7 L80 9 L100 3', stroke: '#6EE7B7' },
+  { label: 'Pipeline', zero: '$0.0M', d: 'M0 13 L20 15 L40 8 L60 11 L80 5 L100 6', stroke: '#818CF8' },
+  { label: 'Win rate', zero: '0.0%', d: 'M0 15 L20 10 L40 12 L60 9 L80 4 L100 7', stroke: '#F472B6' },
+  { label: 'Accounts', zero: '0', d: 'M0 14 L20 13 L40 9 L60 10 L80 6 L100 2', stroke: '#34D399' },
+];
+---
+<section class="pin-wrap hero" data-hero style="height:240vh">
+  <div class="pin">
+    <div class="wrap" data-hero-inner>
+      <div class="hero-grid">
+        <div class="hero-copy" data-copy>
+          <div class="badge"><span class="dot"></span> Inspired by A2UI · Powered by Makepad 2.0</div>
+          <h1><span data-split>From </span><em data-split>Agent</em><br /><span data-split>to </span><em data-split>App</em></h1>
+          <p class="sub">
+            AI Agents don't just chat anymore — they build entire apps. Dynamic, interactive interfaces generated on-the-fly, rendered natively across every device.
+          </p>
+          <div class="chat" aria-live="polite">
+            <div class="bubble user"><span id="typed"></span><span class="caret" id="caret"></span></div>
+            <div class="bubble agent" id="agentBubble" style="opacity:0">
+              Composing 7 components — KPIs, revenue trend, regional split, territory map<span class="think" aria-hidden="true"><i></i><i></i><i></i></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stage" aria-label="Generated sales analytics dashboard, assembling">
+          <div class="bloom" id="bloom"></div>
+          <div class="idle" id="idle"><span class="mono">awaiting a2ui response</span></div>
+          <div class="frame" id="frame" style="opacity:0">
+            <div class="scan" id="scan"></div>
+            <div class="sheen"></div>
+            <div class="lens" id="lens"></div>
+            <div class="frame-bar">
+              <b></b><b></b><b></b>
+              <span class="path mono">sales-analytics · a2ui surface</span>
+              <span class="live mono" id="liveTag" style="opacity:0"><i></i>streaming</span>
+            </div>
+            <div class="frame-body">
+              <div class="kpis">
+                {kpis.map((k, i) => (
+                  <div class="cmp kpi" data-cmp>
+                    <div class="ghost"><span>kpi.card</span></div>
+                    <div class="real">
+                      <div class="lbl">{k.label}</div>
+                      <div class="val" data-val={i}>{k.zero}</div>
+                      <svg class="spark" viewBox="0 0 100 20" preserveAspectRatio="none">
+                        <path d={k.d} stroke={k.stroke} pathLength="1"></path>
+                      </svg>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div class="lower">
+                <div class="cmp" data-cmp>
+                  <div class="ghost"><span>chart.line</span></div>
+                  <div class="real"><div class="pn">
+                    <div class="ttl">Revenue trend <em>+18.4%</em></div>
+                    <svg class="chart-svg" viewBox="0 0 320 118" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="lg" gradientUnits="userSpaceOnUse" x1="100" y1="48" x2="216" y2="140"><stop offset="0" stop-color="#6EE7B7"></stop><stop offset="1" stop-color="#818CF8"></stop></linearGradient>
+                        <linearGradient id="ag" gradientUnits="userSpaceOnUse" x1="100" y1="48" x2="216" y2="140"><stop offset="0" stop-color="#6EE7B7"></stop><stop offset="1" stop-color="#6EE7B7"></stop></linearGradient>
+                      </defs>
+                      <line class="gr" x1="0" y1="30" x2="320" y2="30"></line>
+                      <line class="gr" x1="0" y1="60" x2="320" y2="60"></line>
+                      <line class="gr" x1="0" y1="90" x2="320" y2="90"></line>
+                      <path class="ar" id="area" d="M4 96 L50 82 L96 88 L142 62 L188 68 L234 40 L280 46 L316 18 L316 118 L4 118 Z" style="opacity:0"></path>
+                      <path class="ln" id="line" pathLength="1" d="M4 96 L50 82 L96 88 L142 62 L188 68 L234 40 L280 46 L316 18"></path>
+                      <circle class="pt" id="head" cx="316" cy="18" r="3.5" style="opacity:0"></circle>
+                    </svg>
+                  </div></div>
+                </div>
+
+                <div class="stack">
+                  <div class="cmp" data-cmp>
+                    <div class="ghost"><span>table.bars</span></div>
+                    <div class="real"><div class="pn">
+                      <div class="ttl">By region</div>
+                      <div class="rows" id="rows"></div>
+                    </div></div>
+                  </div>
+
+                  <div class="cmp" data-cmp>
+                    <div class="ghost"><span>map.territory</span></div>
+                    <div class="real"><div class="pn">
+                      <div class="ttl">Territories <em>3 live</em></div>
+                      <svg class="map-svg" viewBox="0 0 200 76" preserveAspectRatio="xMidYMid meet">
+                        <path class="land" d="M12 46 q14 -22 38 -16 q18 -14 38 2 q22 -10 34 8 q16 -4 20 12 q-8 18 -34 16 q-24 8 -48 -2 q-30 8 -48 -20 Z"></path>
+                        <path class="land" d="M136 60 q16 -12 34 -2 q10 10 -4 16 q-22 4 -30 -14 Z"></path>
+                        <circle class="ring" cx="52" cy="34" r="3"></circle><circle class="pin" cx="52" cy="34" r="2.6"></circle>
+                        <circle class="ring" cx="108" cy="28" r="3"></circle><circle class="pin" cx="108" cy="28" r="2.6"></circle>
+                        <circle class="ring" cx="158" cy="60" r="3"></circle><circle class="pin" cx="158" cy="60" r="2.6"></circle>
+                      </svg>
+                    </div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cue" id="cue"><span class="ln"></span>Scroll to generate</div>
+    </div>
+    <div class="verdict" id="verdict">
+      <div><div class="n" id="v0">0</div><div class="l">Components</div></div>
+      <div><div class="n" id="v1">0.0s</div><div class="l">To first paint</div></div>
+      <div><div class="n" id="v2">0</div><div class="l">Lines of code</div></div>
+    </div>
+  </div>
+</section>

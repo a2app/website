@@ -39,7 +39,12 @@ const fail = (html) => {
   loader.innerHTML = `<div class="err">${html}</div>`;
 };
 
-const isGzip = (bytes) => bytes.length > 2 && bytes[0] === 0x1f && bytes[1] === 0x8b;
+// Two bytes are the whole gzip magic, so the guard must accept exactly two.
+// This read `> 2` against a two-byte slice, so it always said "not gzip" and
+// handed compressed bytes to WebAssembly.compile. It never showed locally
+// because the dev server sets Content-Encoding: gzip and the browser has
+// already decompressed by this point; GitHub Pages serves .gz raw.
+const isGzip = (bytes) => bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b;
 
 async function fetchWasm(url) {
   const res = await fetch(url);

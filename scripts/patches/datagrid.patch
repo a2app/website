@@ -7,7 +7,7 @@ index 35bb1d5d4..9b91406e8 100644
          root := DockTabs{
              tabs: [@tSheets @tBigData @tPixels @tWidgets @tCharts]
 -            selected: 0
-+            selected: 1
++            selected: 4
              closable: false
          }
  

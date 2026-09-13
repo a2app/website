@@ -2,8 +2,8 @@
   {
     "id": "datagrid",
     "title": "Data Grids and Charts",
-    "say": "Build me a trading board with live prices, in-row sparklines and candlestick charts",
-    "blurb": "Opens on the charts tab: a price table with a sparkline drawn inside every row, a line and area chart, and candlesticks, all ticking four times a second. The other tabs run the same grid engine as a formula spreadsheet, a million rows by a thousand columns, and widgets inside cells. Every cell is drawn by the Makepad renderer, not by a browser chart library.",
+    "say": "Build me a data grid that holds a million rows and charts them on the same engine",
+    "blurb": "Opens on a million rows by a thousand columns, a billion cells the renderer draws only as you reach them. Click a header to sort all million, or drag the columns around. The other tabs run the same engine as a formula spreadsheet, a live trading board with candlesticks, and widgets nested inside cells. Every cell is drawn by the Makepad renderer, not by a browser table.",
     "width": 1440,
     "height": 900,
     "source": "https://github.com/makepad/makepad/tree/dev/examples/datagrid"

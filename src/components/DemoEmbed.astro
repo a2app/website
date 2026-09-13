@@ -8,10 +8,12 @@ interface Props {
   width: number;
   height: number;
   maxWidth?: number;
+  /** Start without waiting for a click, once it settles in view. Front page only. */
+  autostart?: boolean;
 }
-const { id, title, width, height, maxWidth = width } = Astro.props;
+const { id, title, width, height, maxWidth = width, autostart = false } = Astro.props;
 ---
-<div class="embed" data-embed={id} data-title={title} style={`aspect-ratio:${width}/${height};--embed-w:${maxWidth}px`}>
+<div class="embed" data-embed={id} data-title={title} data-autostart={autostart ? "" : undefined} style={`aspect-ratio:${width}/${height};--embed-w:${maxWidth}px`}>
   <img class="embed-poster" src={`/demos/posters/${id}.webp`} alt={`${title} demo, paused`} width={width} height={height} loading="lazy" decoding="async" />
   <button class="embed-run" type="button" data-run>
     <span class="embed-play" aria-hidden="true"></span>Run demo <span class="mono">1.8 MB</span>

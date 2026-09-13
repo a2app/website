@@ -27,9 +27,14 @@ initBrandDraw();
 
 addEventListener('load', () => {
   ScrollTrigger.refresh();
-  // A cross-page anchor (e.g. /demos#showcase) can lose its landing to the
-  // refresh above; put it back when the page is still sitting at the top.
+  // A cross-page anchor (e.g. /demos#showcase, or /#demo from the nav) can lose
+  // its landing to the refresh above, which re-lays out the pinned stages. The
+  // test used to be `scrollY === 0`, but the refresh usually leaves a few dozen
+  // pixels of drift, so the correction skipped itself and the visitor arrived at
+  // the hero instead. Anything still within a screen of the top means the landing
+  // did not take; the target is a screen or more below, so this cannot fight
+  // someone who has already scrolled to it.
   const id = decodeURIComponent(location.hash.slice(1));
   const target = id ? document.getElementById(id) : null;
-  if (target && scrollY === 0 && target.getBoundingClientRect().top > innerHeight) target.scrollIntoView();
+  if (target && scrollY < innerHeight && target.getBoundingClientRect().top > innerHeight) target.scrollIntoView();
 });
